@@ -1,88 +1,814 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CareNav AI — Healthcare Portal</title>
-    <script>
-        // Immediately load CareNav AI System
-        window.location.replace("healthcare-system/index.html");
-    </script>
-    <style>
-        .box_container {
-            background-color: #ca1d1d;
-            margin: 20px;
-            padding: 20px;
-        }
-        
-        .box {
-            background-color: #153816;
-            color: rgb(216, 196, 196);
-            padding: 20px;
-            margin: 10px;
-            text-align: center;
-            font-size: 20px;
-            border: 2px solid #ccc;
-            border-radius: 10px;
-        }
-        
-        .grid_container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            background-color: #816c6c;
-            padding: 20px;
-            margin: 20px;
-        }
-        
-        @media(max-width: 600px) {
-            .grid_container {
-                grid-template-columns: repeat(1, 1fr);
-            }
-        }
-        
-        .grid_item {
-            background-color: #1d1dca;
-            color: rgb(216, 196, 196);
-            padding: 20px;
-            text-align: center;
-            font-size: 20px;
-            border: 2px solid #ccc;
-            border-radius: 10px;
-        }
-    </style>
+    <title>CareNav AI — Healthcare Record & Care Navigation System</title>
+    <!-- Icons from FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <div style="background: linear-gradient(90deg, #0d9488, #0284c7); padding: 14px 20px; border-radius: 8px; margin: 20px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);">
-        <div>
-            <span style="font-weight: 700; font-size: 1.15rem; display: block;">🏥 CareNav AI — Healthcare Record & Care Navigation System</span>
-            <small style="opacity: 0.9;">AI Symptom Triage, EHR Portal, Medical Report Explainer & Specialist Booking</small>
+    <!-- ================= VIEW 1: AUTHENTICATION (LOGIN & SIGN UP) ================= -->
+    <div id="authScreen" class="auth-wrapper">
+        <div class="auth-container">
+            <!-- Left Info Panel -->
+            <div class="auth-sidebar">
+                <div class="sidebar-brand">
+                    <div class="sidebar-brand-icon">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <h2>CareNav <span>AI</span></h2>
+                </div>
+
+                <div class="sidebar-hero">
+                    <h3>Your Intelligent Healthcare Journey Starts Here</h3>
+                    <p>Securely manage your personal health records, run clinical symptom triage, translate diagnostic lab reports, and book appointments with verified specialists.</p>
+
+                    <ul class="features-checklist">
+                        <li><i class="fa-solid fa-circle-check"></i> Real-time AI triage with urgency scoring</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Plain English medical lab report translations</li>
+                        <li><i class="fa-solid fa-circle-check"></i> One-click Emergency SOS medical identity card</li>
+                        <li><i class="fa-solid fa-circle-check"></i> Multi-role access (Patient & Doctor)</li>
+                    </ul>
+                </div>
+
+                <div style="font-size: 0.75rem; color: #94a3b8;">
+                    &copy; 2026 CareNav AI Systems &bull; Enterprise Telehealth & EHR
+                </div>
+            </div>
+
+            <!-- Right Auth Form Section -->
+            <div class="auth-content">
+                <!-- Navigation Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab-btn active" id="tabLoginBtn">Sign In</button>
+                    <button class="auth-tab-btn" id="tabSignupBtn">Create Account</button>
+                </div>
+
+                <!-- Feedback Alert Box -->
+                <div class="alert-box" id="authAlert"></div>
+
+                <!-- Role Selector -->
+                <div class="role-selector">
+                    <button class="role-btn active" data-role="patient" id="rolePatient">
+                        <i class="fa-solid fa-user-injured"></i> Patient
+                    </button>
+                    <button class="role-btn" data-role="doctor" id="roleDoctor">
+                        <i class="fa-solid fa-user-doctor"></i> Doctor / Provider
+                    </button>
+                </div>
+
+                <!-- FORM 1: LOGIN -->
+                <form id="loginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="alex.morgan@healthmail.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.82rem;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: var(--text-secondary);">
+                            <input type="checkbox" id="rememberMe" checked> Remember this device
+                        </label>
+                        <a href="#" style="color: var(--primary); text-decoration: none; font-weight: 600;" onclick="alert('Demo reset instructions sent to your email!'); return false;">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" style="padding: 12px; font-size: 0.95rem;">
+                        <i class="fa-solid fa-right-to-bracket"></i> Sign In to Portal
+                    </button>
+                </form>
+
+                <!-- FORM 2: SIGN UP -->
+                <form id="signupForm" class="auth-form">
+                    <div class="form-group">
+                        <label for="signupName">Full Legal Name</label>
+                        <input type="text" id="signupName" class="form-control" placeholder="e.g. Jordan Lee" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label for="signupEmail">Email Address</label>
+                            <input type="email" id="signupEmail" class="form-control" placeholder="jordan@example.com" required>
+                        </div>
+                        <div class="form-group flex-1" id="ageFieldWrapper">
+                            <label for="signupAge">Age</label>
+                            <input type="number" id="signupAge" class="form-control" placeholder="32" min="1" max="120">
+                        </div>
+                    </div>
+
+                    <!-- Patient Specific Fields -->
+                    <div id="patientSpecificFields">
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label for="signupBloodGroup">Blood Group</label>
+                                <select id="signupBloodGroup" class="form-control">
+                                    <option value="O Positive (Rh+)" selected>O Positive (Rh+)</option>
+                                    <option value="O Negative (Rh-)">O Negative (Rh-)</option>
+                                    <option value="A Positive (Rh+)">A Positive (Rh+)</option>
+                                    <option value="A Negative (Rh-)">A Negative (Rh-)</option>
+                                    <option value="B Positive (Rh+)">B Positive (Rh+)</option>
+                                    <option value="B Negative (Rh-)">B Negative (Rh-)</option>
+                                    <option value="AB Positive (Rh+)">AB Positive (Rh+)</option>
+                                    <option value="AB Negative (Rh-)">AB Negative (Rh-)</option>
+                                </select>
+                            </div>
+                            <div class="form-group flex-1">
+                                <label for="signupAllergies">Known Allergies</label>
+                                <input type="text" id="signupAllergies" class="form-control" placeholder="e.g. Penicillin, Pollen (or None)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doctor Specific Fields -->
+                    <div id="doctorSpecificFields" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label for="signupSpecialty">Specialty</label>
+                                <select id="signupSpecialty" class="form-control">
+                                    <option value="General Physician">General Medicine</option>
+                                    <option value="Cardiologist">Cardiology</option>
+                                    <option value="Gastroenterologist">Gastroenterology</option>
+                                    <option value="Neurologist">Neurology</option>
+                                    <option value="Pulmonologist">Pulmonology</option>
+                                    <option value="Dermatologist">Dermatology</option>
+                                    <option value="Orthopedic">Orthopedics</option>
+                                </select>
+                            </div>
+                            <div class="form-group flex-1">
+                                <label for="signupLicense">Medical License #</label>
+                                <input type="text" id="signupLicense" class="form-control" placeholder="e.g. MED-884920">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" id="signupPassword" class="form-control" placeholder="Minimum 6 characters" required minlength="6">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label for="signupConfirmPassword">Confirm Password</label>
+                            <input type="password" id="signupConfirmPassword" class="form-control" placeholder="Confirm password" required minlength="6">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" style="padding: 12px; font-size: 0.95rem;">
+                        <i class="fa-solid fa-user-plus"></i> Register & Create Account
+                    </button>
+                </form>
+
+                <!-- One-Click Demo Accounts -->
+                <div class="demo-accounts">
+                    <div class="demo-title">⚡ Quick 1-Click Demo Accounts:</div>
+                    <div class="demo-pills">
+                        <div class="btn-demo" id="demoPatientBtn">
+                            <span><i class="fa-solid fa-user-injured"></i> Alex Morgan (Patient &bull; O+ &bull; Asthma)</span>
+                            <span>Sign in &rarr;</span>
+                        </div>
+                        <div class="btn-demo" id="demoDoctorBtn">
+                            <span><i class="fa-solid fa-user-doctor"></i> Dr. Evelyn Reed (Physician &bull; St. Jude)</span>
+                            <span>Sign in &rarr;</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
-        <a href="healthcare-system/index.html" style="background: white; color: #0f766e; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: bold; white-space: nowrap; margin-left: 12px;">Launch Healthcare System &rarr;</a>
     </div>
 
-    <div style="background: linear-gradient(90deg, #4f46e5, #9333ea); padding: 12px 20px; border-radius: 8px; margin: 20px; display: flex; justify-content: space-between; align-items: center; color: white;">
-        <span style="font-weight: 600; font-size: 1.05rem;">✨ OmniCalc AI — Smart & Scientific Calculator</span>
-        <a href="ai-calculator.html" style="background: white; color: #4f46e5; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold;">Launch AI Calculator &rarr;</a>
+    <!-- ================= VIEW 2: MAIN HEALTHCARE DASHBOARD ================= -->
+    <div id="appScreen" style="display: none; min-height: 100vh; flex-direction: column;">
+        <!-- Top Medical Header -->
+        <header class="navbar">
+        <div class="nav-brand">
+            <div class="brand-logo">
+                <i class="fa-solid fa-heart-pulse"></i>
+            </div>
+            <div class="brand-info">
+                <h1>CareNav <span>AI</span></h1>
+                <p>Intelligent Healthcare Records & Patient Navigation</p>
+            </div>
+        </div>
+
+        <div class="nav-patient-info">
+            <div id="serverStatusBadge" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(13, 148, 136, 0.12); color: var(--teal); border: 1px solid rgba(13, 148, 136, 0.3);">
+                <span id="serverStatusDot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--teal); display: inline-block;"></span>
+                <span id="serverStatusText">SQLite Backend Online</span>
+            </div>
+            <div class="patient-badge" id="patientBadge">
+                <div class="avatar" id="navAvatar">
+                    <i class="fa-solid fa-user-injured"></i>
+                </div>
+                <div class="patient-meta">
+                    <span class="p-name" id="currentPatientName">Alex Morgan</span>
+                    <span class="p-sub" id="currentPatientSub">ID: #CN-88492 &bull; Age: 34 &bull; Blood: O+</span>
+                </div>
+            </div>
+
+            <button class="btn btn-emergency" id="emergencyCardBtn">
+                <i class="fa-solid fa-triangle-exclamation"></i> Emergency SOS
+            </button>
+            <button class="btn btn-outline" id="openSettingsBtn" title="API Settings">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+            <button class="btn btn-outline" id="logoutBtn" title="Sign Out / Switch User" style="color: var(--danger);">
+                <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+        </div>
+    </header>
+
+    <!-- App Container -->
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="triage">
+                    <i class="fa-solid fa-compass"></i>
+                    <span>AI Care Triage</span>
+                </button>
+                <button class="nav-item" data-tab="records">
+                    <i class="fa-solid fa-file-medical"></i>
+                    <span>Health Records (EHR)</span>
+                </button>
+                <button class="nav-item" data-tab="explainer">
+                    <i class="fa-solid fa-brain"></i>
+                    <span>AI Report Explainer</span>
+                </button>
+                <button class="nav-item" data-tab="doctors">
+                    <i class="fa-solid fa-user-doctor"></i>
+                    <span>Find & Book Doctors</span>
+                </button>
+                <button class="nav-item" data-tab="chat">
+                    <i class="fa-solid fa-comments"></i>
+                    <span>AI Health Companion</span>
+                </button>
+            </nav>
+
+            <!-- Quick Vitals Snapshot Widget -->
+            <div class="sidebar-vitals-card">
+                <h4><i class="fa-solid fa-heart-circle-check"></i> Latest Vitals</h4>
+                <div class="vital-mini">
+                    <span>Blood Pressure</span>
+                    <strong id="miniBp">120/80 mmHg</strong>
+                </div>
+                <div class="vital-mini">
+                    <span>Heart Rate</span>
+                    <strong id="miniHr">74 bpm</strong>
+                </div>
+                <div class="vital-mini">
+                    <span>Glucose (Fasting)</span>
+                    <strong id="miniGl">96 mg/dL</strong>
+                </div>
+                <div class="vital-mini">
+                    <span>SpO2 Level</span>
+                    <strong id="miniSpo2">99%</strong>
+                </div>
+            </div>
+
+            <!-- Disclaimer Notice -->
+            <div class="medical-disclaimer">
+                <i class="fa-solid fa-shield-halved"></i>
+                <small>CareNav AI assists with health management & navigation. In immediate life-threatening emergencies, call 911 or visit the nearest ER.</small>
+            </div>
+        </aside>
+
+        <!-- Main Dynamic Content Workspace -->
+        <main class="content-area">
+
+            <!-- ================= TAB 1: AI CARE TRIAGE & NAVIGATION ================= -->
+            <section id="tab-triage" class="tab-pane active">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-wand-magic-sparkles"></i> AI Symptom Assessment & Care Triage</h2>
+                        <p>Describe your symptoms in natural language. Our clinical logic engine evaluates urgency, suggests the most suitable medical specialist, and outlines next steps.</p>
+                    </div>
+                    <div class="triage-status-pill" id="engineStatusBadge">
+                        <i class="fa-solid fa-bolt"></i> Clinical Logic Engine Active
+                    </div>
+                </div>
+
+                <div class="triage-grid">
+                    <!-- Left: Input Form -->
+                    <div class="card triage-form-card">
+                        <h3><i class="fa-solid fa-notes-medical"></i> Describe Your Symptoms</h3>
+                        <p class="card-subtitle">Be as specific as possible (location, severity 1-10, duration, and triggers).</p>
+
+                        <div class="form-group">
+                            <label for="symptomInput">What are you feeling?</label>
+                            <textarea id="symptomInput" class="form-control" rows="4" placeholder="e.g. I have sharp throbbing headache on my right side with light sensitivity and mild nausea since yesterday morning..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group flex-1">
+                                <label for="durationSelect">Duration</label>
+                                <select id="durationSelect" class="form-control">
+                                    <option value="few-hours">Less than 6 hours</option>
+                                    <option value="today" selected>1-2 days</option>
+                                    <option value="several-days">3-7 days</option>
+                                    <option value="weeks">More than 1 week</option>
+                                    <option value="chronic">Ongoing / Chronic</option>
+                                </select>
+                            </div>
+                            <div class="form-group flex-1">
+                                <label for="severityRange">Pain / Discomfort Severity: <span id="severityVal">5</span>/10</label>
+                                <input type="range" id="severityRange" min="1" max="10" value="5" class="range-slider">
+                            </div>
+                        </div>
+
+                        <!-- Predefined Quick Scenarios -->
+                        <div class="quick-scenarios">
+                            <span class="scenario-label">Quick sample cases:</span>
+                            <div class="scenario-pills">
+                                <span class="badge-pill" data-symptom="Severe crushing chest pain radiating to left arm with shortness of breath and cold sweating" data-sev="10">🚨 Red Flag: Chest Pain</span>
+                                <span class="badge-pill" data-symptom="Persistent dry cough, mild fever of 100.4 F, sore throat, and fatigue for 3 days" data-sev="4">🤧 Viral Flu / Cough</span>
+                                <span class="badge-pill" data-symptom="Sharp pain in the lower right abdomen that hurts more when walking, accompanied by nausea" data-sev="8">⚠️ Appendicitis Watch</span>
+                                <span class="badge-pill" data-symptom="Skin redness, itchy rash on both forearms after gardening" data-sev="3">🌿 Skin Allergy</span>
+                                <span class="badge-pill" data-symptom="Throbbing migraine headache on one side with light sensitivity" data-sev="7">⚡ Migraine</span>
+                                <span class="badge-pill" data-symptom="Dull lower back ache after lifting heavy boxes yesterday" data-sev="5">🏋️ Back Strain</span>
+                            </div>
+                        </div>
+
+                        <button id="runTriageBtn" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-stethoscope"></i> Assess Symptoms & Navigate Care
+                        </button>
+                    </div>
+
+                    <!-- Right: Triage Assessment Result -->
+                    <div class="card triage-result-card" id="triageResultCard">
+                        <div class="empty-state" id="triageEmptyState">
+                            <i class="fa-solid fa-clipboard-question"></i>
+                            <h4>No Symptom Assessed Yet</h4>
+                            <p>Type your symptoms on the left or select a sample case to generate your clinical care path.</p>
+                        </div>
+
+                        <div id="triageOutput" style="display: none;">
+                            <div class="urgency-banner" id="urgencyBanner">
+                                <div class="urgency-icon" id="urgencyIcon">
+                                    <i class="fa-solid fa-circle-exclamation"></i>
+                                </div>
+                                <div class="urgency-details">
+                                    <h3 id="urgencyLevel">Urgent Care (Code Yellow)</h3>
+                                    <p id="urgencyAdvice">Recommended evaluation within 12-24 hours.</p>
+                                </div>
+                            </div>
+
+                            <div class="triage-section">
+                                <h4><i class="fa-solid fa-user-doctor"></i> Recommended Specialist</h4>
+                                <div class="specialist-highlight" id="recommendedSpecialist">
+                                    General Physician / Internist
+                                </div>
+                                <button class="btn btn-secondary btn-sm" id="bookSpecialistBtn" style="margin-top: 8px;">
+                                    <i class="fa-solid fa-calendar-check"></i> Book this specialist now
+                                </button>
+                            </div>
+
+                            <div class="triage-section">
+                                <h4><i class="fa-solid fa-list-check"></i> Potential Differential Considerations</h4>
+                                <ul id="potentialConditionsList" class="info-list"></ul>
+                            </div>
+
+                            <div class="triage-section">
+                                <h4><i class="fa-solid fa-hand-holding-medical"></i> Immediate Self-Care & Precautions</h4>
+                                <p id="selfCareAdvice" class="advice-text"></p>
+                            </div>
+
+                            <div class="triage-section">
+                                <h4><i class="fa-solid fa-circle-question"></i> Questions to Ask Your Doctor</h4>
+                                <ul id="questionsToDoctorList" class="info-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB 2: HEALTH RECORDS (EHR) ================= -->
+            <section id="tab-records" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-file-medical"></i> Electronic Health Records (EHR)</h2>
+                        <p>Centralized medical history, active prescriptions, tracked vitals, and laboratory documents.</p>
+                    </div>
+                    <button class="btn btn-primary" id="openAddVitalModal">
+                        <i class="fa-solid fa-plus"></i> Record New Vital
+                    </button>
+                </div>
+
+                <!-- Patient Overview Strip -->
+                <div class="ehr-summary-grid">
+                    <div class="card summary-box">
+                        <div class="sum-icon bg-red"><i class="fa-solid fa-droplet"></i></div>
+                        <div>
+                            <span class="sum-label">Blood Type</span>
+                            <h3 class="sum-value">O Positive (Rh+)</h3>
+                        </div>
+                    </div>
+                    <div class="card summary-box">
+                        <div class="sum-icon bg-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div>
+                            <span class="sum-label">Allergies</span>
+                            <h3 class="sum-value">Penicillin, Peanuts</h3>
+                        </div>
+                    </div>
+                    <div class="card summary-box">
+                        <div class="sum-icon bg-blue"><i class="fa-solid fa-heart-pulse"></i></div>
+                        <div>
+                            <span class="sum-label">Chronic Conditions</span>
+                            <h3 class="sum-value">Mild Asthma, Pre-diabetes</h3>
+                        </div>
+                    </div>
+                    <div class="card summary-box">
+                        <div class="sum-icon bg-teal"><i class="fa-solid fa-phone"></i></div>
+                        <div>
+                            <span class="sum-label">Emergency Contact</span>
+                            <h3 class="sum-value">Sarah Morgan (Spouse)</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="records-content-grid">
+                    <!-- Vitals History Table -->
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <h3><i class="fa-solid fa-chart-line"></i> Vitals Log & Trends</h3>
+                            <span class="badge-tag">Last 30 Days</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="vitalsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date & Time</th>
+                                        <th>Blood Pressure</th>
+                                        <th>Heart Rate</th>
+                                        <th>Blood Glucose</th>
+                                        <th>SpO2</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="vitalsTableBody">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Prescriptions & Active Medications -->
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <h3><i class="fa-solid fa-pills"></i> Current Medications & Regimen</h3>
+                            <button class="btn btn-outline btn-sm" id="openAddMedModal"><i class="fa-solid fa-plus"></i> Add Med</button>
+                        </div>
+                        <div class="meds-list" id="medicationsList">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB 3: AI MEDICAL REPORT EXPLAINER ================= -->
+            <section id="tab-explainer" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-brain"></i> AI Medical Report Explainer</h2>
+                        <p>Translate complex clinical lab reports, medical jargon, and diagnostic test numbers into clear, patient-friendly guidance.</p>
+                    </div>
+                </div>
+
+                <div class="explainer-grid">
+                    <div class="card">
+                        <h3><i class="fa-solid fa-file-invoice"></i> Select or Paste Lab Report</h3>
+                        <p class="card-subtitle">Choose a pre-loaded clinical lab test or paste any medical test text below.</p>
+
+                        <div class="form-group">
+                            <label>Quick Preset Lab Tests:</label>
+                            <div class="report-presets">
+                                <button class="btn btn-outline btn-sm report-preset-btn" data-preset="lipid">Comprehensive Lipid Profile</button>
+                                <button class="btn btn-outline btn-sm report-preset-btn" data-preset="cbc">Complete Blood Count (CBC)</button>
+                                <button class="btn btn-outline btn-sm report-preset-btn" data-preset="diabetic">HbA1c & Fasting Glucose</button>
+                                <button class="btn btn-outline btn-sm report-preset-btn" data-preset="thyroid">Thyroid Function (TSH)</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="reportTextInput">Clinical Notes / Lab Values:</label>
+                            <textarea id="reportTextInput" class="form-control" rows="8" placeholder="Paste your lab report text here... (e.g. Total Cholesterol: 242 mg/dL, HDL: 38 mg/dL, LDL: 165 mg/dL, Triglycerides: 195 mg/dL)"></textarea>
+                        </div>
+
+                        <button id="explainReportBtn" class="btn btn-primary btn-block">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Translate & Explain Report
+                        </button>
+                    </div>
+
+                    <div class="card explainer-result-card" id="explainerResultCard">
+                        <div class="empty-state" id="explainerEmptyState">
+                            <i class="fa-solid fa-microscope"></i>
+                            <h4>No Report Analyzed Yet</h4>
+                            <p>Pick a preset lab report on the left or paste your clinical results to get an immediate patient-friendly breakdown.</p>
+                        </div>
+
+                        <div id="explainerOutput" style="display: none;">
+                            <div class="explainer-summary-box">
+                                <div class="explainer-summary-header">
+                                    <h4 id="reportTitle">Comprehensive Lipid Profile Analysis</h4>
+                                    <span class="badge-tag" id="reportRiskBadge">Attention Needed</span>
+                                </div>
+                                <p id="reportOverviewText"></p>
+                            </div>
+
+                            <div class="lab-items-container" id="labItemsContainer">
+                                <!-- Populated dynamically with each test marker, status, and plain english explanation -->
+                            </div>
+
+                            <div class="lifestyle-recommendations">
+                                <h4><i class="fa-solid fa-apple-whole"></i> Doctor-Recommended Lifestyle Action Steps</h4>
+                                <ul id="lifestyleStepsList" class="info-list"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB 4: FIND & BOOK DOCTORS ================= -->
+            <section id="tab-doctors" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-user-doctor"></i> Find & Schedule Specialists</h2>
+                        <p>Discover verified physicians filtered by specialty, hospital affiliation, ratings, and availability.</p>
+                    </div>
+                    <div class="filter-controls">
+                        <select id="specialtyFilter" class="form-control">
+                            <option value="all">All Specialties</option>
+                            <option value="General Physician">General Medicine</option>
+                            <option value="Cardiologist">Cardiology</option>
+                            <option value="Gastroenterologist">Gastroenterology</option>
+                            <option value="Neurologist">Neurology</option>
+                            <option value="Pulmonologist">Pulmonology</option>
+                            <option value="Dermatologist">Dermatology</option>
+                            <option value="Orthopedic">Orthopedics</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="doctors-grid" id="doctorsGrid">
+                    <!-- Populated via JS -->
+                </div>
+            </section>
+
+            <!-- ================= TAB 5: AI HEALTH COMPANION CHAT ================= -->
+            <section id="tab-chat" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-comments"></i> AI Health Companion</h2>
+                        <p>Ask 24/7 questions about medications, procedure preparations, side effects, and wellness tips.</p>
+                    </div>
+                </div>
+
+                <div class="chat-container card">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-bubble bot">
+                            <div class="chat-avatar"><i class="fa-solid fa-robot"></i></div>
+                            <div class="chat-text">
+                                Hello Alex! I am your CareNav Health Companion. You can ask me questions regarding your medication timings, appointment preparation, understanding medical terms, or general wellness advice. How can I assist you today?
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-suggestions">
+                        <span class="pill-chat" data-q="Do I need to fast before my lipid profile test?">Need to fast before lipid test?</span>
+                        <span class="pill-chat" data-q="What are common side effects of Metformin?">Metformin side effects</span>
+                        <span class="pill-chat" data-q="How can I naturally lower my blood pressure?">Tips to lower blood pressure</span>
+                        <span class="pill-chat" data-q="What should I do if I miss a dose of medication?">Missed a dose?</span>
+                    </div>
+
+                    <div class="chat-input-bar">
+                        <input type="text" id="chatInput" class="form-control" placeholder="Type a health question...">
+                        <button id="sendChatBtn" class="btn btn-primary">
+                            <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
-    <h1>Welcome to vignan</h1>
-    <div class="box_container">
-        <div class="box">box1</div>
-        <div class="box">box2</div>
-        <div class="box">box3</div>
-        <div class="box">box4</div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Emergency SOS Modal -->
+    <div class="modal-backdrop" id="emergencyModal">
+        <div class="modal-card emergency-dialog">
+            <div class="modal-header bg-danger-grad">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> Emergency Medical SOS Card</h3>
+                <button class="modal-close" id="closeEmergencyModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="emergency-alert-box">
+                    <strong>Critical Emergency Protocol:</strong>
+                    If the patient is unconscious, experiencing acute chest pain, severe breathing difficulty, or stroke symptoms (FAST), call <strong>911 / 112</strong> immediately.
+                </div>
+
+                <div class="emergency-vitals-grid">
+                    <div class="em-item"><span>Patient Name</span><strong>Alex Morgan (34 M)</strong></div>
+                    <div class="em-item"><span>Blood Group</span><strong style="color: #ef4444; font-size: 1.2rem;">O Positive (Rh+)</strong></div>
+                    <div class="em-item"><span>Severe Allergies</span><strong style="color: #ef4444;">PENICILLIN, PEANUTS</strong></div>
+                    <div class="em-item"><span>Current Meds</span><strong>Metformin (500mg), Albuterol Inhaler</strong></div>
+                    <div class="em-item"><span>Primary Physician</span><strong>Dr. Evelyn Reed (St. Jude Hospital)</strong></div>
+                    <div class="em-item"><span>Emergency Contact</span><strong>Sarah Morgan (+1 555-019-2834)</strong></div>
+                </div>
+
+                <div class="emergency-actions">
+                    <a href="tel:911" class="btn btn-emergency btn-block" style="text-align: center; text-decoration: none;">
+                        <i class="fa-solid fa-phone-volume"></i> Call 911 Emergency
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="grid_container">
-        <div class="grid_item">box5</div>
-        <div class="grid_item">box6</div>
-        <div class="grid_item">box7</div>
-        <div class="grid_item">box8</div>
-        <div class="grid_item">box9</div>
-        <div class="grid_item">box10</div>
-        <div class="grid_item">box11</div>
+
+    <!-- Add Vital Modal -->
+    <div class="modal-backdrop" id="addVitalModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-heart-pulse"></i> Record New Vital Measurement</h3>
+                <button class="modal-close" id="closeAddVitalModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addVitalForm">
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label for="bpSystolic">Systolic BP (mmHg)</label>
+                            <input type="number" id="bpSystolic" class="form-control" placeholder="120" required min="70" max="250">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label for="bpDiastolic">Diastolic BP (mmHg)</label>
+                            <input type="number" id="bpDiastolic" class="form-control" placeholder="80" required min="40" max="150">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label for="heartRateInput">Heart Rate (bpm)</label>
+                            <input type="number" id="heartRateInput" class="form-control" placeholder="72" required min="30" max="220">
+                        </div>
+                        <div class="form-group flex-1">
+                            <label for="glucoseInput">Blood Glucose (mg/dL)</label>
+                            <input type="number" id="glucoseInput" class="form-control" placeholder="95" required min="40" max="500">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="spo2Input">Oxygen Saturation - SpO2 (%)</label>
+                        <input type="number" id="spo2Input" class="form-control" placeholder="98" required min="70" max="100">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fa-solid fa-check"></i> Save to Health Record
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
+
+    <!-- Add Medication Modal -->
+    <div class="modal-backdrop" id="addMedModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-pills"></i> Add Medication Regimen</h3>
+                <button class="modal-close" id="closeAddMedModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addMedForm">
+                    <div class="form-group">
+                        <label for="medName">Medication Name & Strength</label>
+                        <input type="text" id="medName" class="form-control" placeholder="e.g. Amoxicillin 500mg" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group flex-1">
+                            <label for="medFrequency">Frequency</label>
+                            <select id="medFrequency" class="form-control" required>
+                                <option value="Once daily">Once daily (Morning)</option>
+                                <option value="Twice daily" selected>Twice daily (Morning & Night)</option>
+                                <option value="Three times daily">Three times daily</option>
+                                <option value="As needed (PRN)">As needed (PRN)</option>
+                            </select>
+                        </div>
+                        <div class="form-group flex-1">
+                            <label for="medPurpose">Indication / Purpose</label>
+                            <input type="text" id="medPurpose" class="form-control" placeholder="e.g. Infection, Blood pressure" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fa-solid fa-check"></i> Save Medication
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Appointment Modal -->
+    <div class="modal-backdrop" id="bookingModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-calendar-plus"></i> Schedule Doctor Appointment</h3>
+                <button class="modal-close" id="closeBookingModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="selected-doc-info" id="selectedDocInfo">
+                    <!-- Populated dynamically -->
+                </div>
+                <form id="appointmentForm">
+                    <div class="form-group">
+                        <label for="apptDate">Select Date</label>
+                        <input type="date" id="apptDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apptSlot">Available Time Slot</label>
+                        <select id="apptSlot" class="form-control" required>
+                            <option value="09:00 AM">09:00 AM - 09:30 AM</option>
+                            <option value="10:30 AM">10:30 AM - 11:00 AM</option>
+                            <option value="02:00 PM">02:00 PM - 02:30 PM</option>
+                            <option value="04:15 PM">04:15 PM - 04:45 PM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="apptNotes">Reason for Visit</label>
+                        <input type="text" id="apptNotes" class="form-control" placeholder="e.g. Follow-up regarding symptom triage advice">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fa-solid fa-calendar-check"></i> Confirm Appointment
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-backdrop" id="settingsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-gear"></i> System Settings & Gemini AI</h3>
+                <button class="modal-close" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>CareNav AI includes a built-in <strong>clinical decision-support logic engine</strong> that works completely offline with zero API key required.</p>
+                <p>You can optionally provide a free <strong>Google Gemini API key</strong> to unlock open-ended natural clinical conversation and deep biomedical research insights.</p>
+
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="geminiKey">Google Gemini API Key (Optional):</label>
+                    <input type="password" id="geminiKey" class="form-control" placeholder="AIzaSy...">
+                    <small style="color: var(--text-muted); display: block; margin-top: 4px;">
+                        Stored locally in your browser's <code>localStorage</code>.
+                    </small>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+                    <button class="btn btn-outline" id="removeKeyBtn">Remove Key</button>
+                    <button class="btn btn-primary" id="saveKeyBtn">Save Settings</button>
+                </div>
+            </div>
+        </div>
+    </div> <!-- Close #settingsModal -->
+
+    <!-- Database Inspector Modal -->
+    <div class="modal-backdrop" id="databaseModal">
+        <div class="modal-card" style="max-width: 720px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-database" style="color: var(--teal);"></i> Live Healthcare Database Inspector</h3>
+                <button class="modal-close" id="closeDatabaseModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);">
+                        Storage Engine: <strong>Browser NoSQL / LocalStorage</strong> &bull; SQL Schema Ready
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-outline btn-sm" id="exportDbJsonBtn"><i class="fa-solid fa-download"></i> Download JSON</button>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <button class="btn btn-outline btn-sm db-tab-btn active" data-table="users">Users (Patients & Doctors)</button>
+                    <button class="btn btn-outline btn-sm db-tab-btn" data-table="vitals">Vitals Table</button>
+                    <button class="btn btn-outline btn-sm db-tab-btn" data-table="medications">Medications</button>
+                    <button class="btn btn-outline btn-sm db-tab-btn" data-table="appointments">Appointments</button>
+                    <button class="btn btn-outline btn-sm db-tab-btn" data-table="schema">SQL Schema (schema.sql)</button>
+                </div>
+
+                <pre id="dbViewerContent" style="background: #0f172a; color: #38bdf8; padding: 16px; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.8rem; max-height: 360px; overflow: auto; border: 1px solid var(--border-color);"></pre>
+
+                <div style="margin-top: 14px; font-size: 0.78rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center;">
+                    <span>📁 Physical SQL file located at: <code>healthcare-system/database/schema.sql</code></span>
+                    <button class="btn btn-outline btn-sm" id="resetDemoDbBtn" style="color: var(--danger);"><i class="fa-solid fa-rotate-left"></i> Reset Demo Data</button>
+                </div>
+            </div>
+        </div>
+    </div> <!-- Close #databaseModal -->
+    </div> <!-- Close #appScreen -->
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
 </body>
 
 </html>
