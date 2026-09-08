@@ -1478,3 +1478,74 @@ body {
     color: #065f46;
     border: 1px solid #86efac;
 }
+
+/* Clinical Toast Notification System */
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 999999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+
+.toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #ffffff;
+    color: var(--text-primary);
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
+    border-left: 4px solid var(--teal);
+    font-size: 0.88rem;
+    font-weight: 500;
+    min-width: 280px;
+    max-width: 440px;
+    opacity: 0;
+    transform: translateX(40px);
+    transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.toast-success {
+    border-left-color: var(--teal);
+}
+.toast-success .toast-icon {
+    color: var(--teal);
+}
+
+.toast-info {
+    border-left-color: var(--primary);
+}
+.toast-info .toast-icon {
+    color: var(--primary);
+}
+
+.toast-warning {
+    border-left-color: var(--warning);
+}
+.toast-warning .toast-icon {
+    color: var(--warning);
+}
+
+.toast-error {
+    border-left-color: var(--danger);
+}
+.toast-error .toast-icon {
+    color: var(--danger);
+}
+

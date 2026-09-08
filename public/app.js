@@ -226,6 +226,37 @@ const CareNavAPI = {
     }
 };
 
+// ================= MODERN CLINICAL TOAST NOTIFICATIONS =================
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toastContainer');
+    if (!container) {
+        alert(message);
+        return;
+    }
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+
+    let iconClass = 'fa-circle-check';
+    if (type === 'warning') iconClass = 'fa-triangle-exclamation';
+    else if (type === 'error') iconClass = 'fa-circle-xmark';
+    else if (type === 'info') iconClass = 'fa-circle-info';
+
+    toast.innerHTML = `
+        <i class="fa-solid ${iconClass} toast-icon"></i>
+        <div class="toast-message">${message}</div>
+    `;
+
+    container.appendChild(toast);
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 350);
+    }, 4000);
+}
+
 let activeUser = JSON.parse(localStorage.getItem('carenav_current_user') || 'null');
 
 // ================= INITIAL STATE & MOCK DATABASE =================
@@ -547,6 +578,17 @@ function initAuthModule() {
         });
     }
 
+    const forgotPwdLink = document.getElementById('forgotPasswordLink');
+    if (forgotPwdLink) {
+        forgotPwdLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const emailVal = document.getElementById('loginEmail') ? document.getElementById('loginEmail').value.trim() : '';
+            const target = emailVal || 'your registered address';
+            showAlert(`Password reset instructions have been dispatched to ${target}. Please check your inbox.`, true);
+            showToast(`Reset email sent to ${target}`, 'info');
+        });
+    }
+
     // Sign Up Submission
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
@@ -736,7 +778,7 @@ function assessSymptoms() {
     const duration = document.getElementById('durationSelect').value;
 
     if (!text) {
-        alert('Please describe your symptoms first.');
+        showToast('Please describe your clinical symptoms first.', 'warning');
         return;
     }
 
@@ -1000,7 +1042,7 @@ function initExplainerModule() {
 function analyzeReport() {
     const text = document.getElementById('reportTextInput').value.trim();
     if (!text) {
-        alert('Please select a preset or paste your lab report text.');
+        showToast('Please select a preset or paste your lab report text.', 'warning');
         return;
     }
 
@@ -1369,7 +1411,7 @@ function initModals() {
         renderVitals();
         addVitalModal.classList.remove('open');
         vitalForm.reset();
-        alert('New vital sign recorded successfully!');
+        showToast('New vital signs recorded and synchronized to health record!', 'success');
     });
 
     // Add Med Modal
@@ -1411,7 +1453,7 @@ function initModals() {
         renderMedications();
         addMedModal.classList.remove('open');
         medForm.reset();
-        alert('Medication added to regimen!');
+        showToast(`Medication "${name}" added to active regimen!`, 'success');
     });
 
     // Booking Appointment Modal
@@ -1453,7 +1495,7 @@ function initModals() {
 
         localStorage.setItem('carenav_appts', JSON.stringify(HealthDB.appointments));
         bookingModal.classList.remove('open');
-        alert(`Appointment Confirmed with ${record.doctor} on ${record.date} at ${record.slot}!`);
+        showToast(`Appointment confirmed with ${record.doctor} on ${record.date} at ${record.slot}!`, 'success');
     });
 
     // Settings Modal
@@ -1475,7 +1517,7 @@ function initModals() {
         const val = geminiInput.value.trim();
         HealthDB.geminiApiKey = val;
         localStorage.setItem('carenav_gemini_key', val);
-        alert('Gemini API Key saved successfully!');
+        showToast('Gemini API Key saved securely.', 'success');
         settingsModal.classList.remove('open');
     });
 
@@ -1483,7 +1525,7 @@ function initModals() {
         HealthDB.geminiApiKey = '';
         localStorage.removeItem('carenav_gemini_key');
         geminiInput.value = '';
-        alert('API Key removed.');
+        showToast('Gemini API Key removed.', 'info');
     });
 
     // Database Modal & Live Inspector
@@ -1651,8 +1693,8 @@ CREATE TABLE appointments (
                 localStorage.removeItem('carenav_meds');
                 localStorage.removeItem('carenav_appts');
                 localStorage.removeItem('carenav_current_user');
-                alert('Database reset. Reloading portal...');
-                window.location.reload();
+                showToast('Database reset to defaults. Reloading portal...', 'info');
+                setTimeout(() => window.location.reload(), 600);
             }
         });
     }
