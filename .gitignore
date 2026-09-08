@@ -1,0 +1,12 @@
+node_modules/
+healthcare-system/node_modules/
+.env
+*.log
+*.db
+*.db-wal
+*.db-shm
+CareNav-AI-Healthcare.zip
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

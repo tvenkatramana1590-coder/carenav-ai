@@ -1,0 +1,118 @@
+{
+  "users": [
+    {
+      "id": "CN-88492",
+      "name": "Alex Morgan",
+      "email": "alex.morgan@healthmail.com",
+      "password": "password123",
+      "role": "patient",
+      "age": 34,
+      "gender": "Male",
+      "bloodGroup": "O Positive (Rh+)",
+      "allergies": ["Penicillin", "Peanuts"],
+      "chronicConditions": ["Mild Asthma", "Pre-diabetes"],
+      "emergencyContact": "Sarah Morgan (Spouse) - +1 (555) 019-2834",
+      "primaryCarePhysician": "Dr. Evelyn Reed (St. Jude Hospital)"
+    },
+    {
+      "id": "DOC-1029",
+      "name": "Dr. Evelyn Reed, MD",
+      "email": "dr.reed@stjude.org",
+      "password": "doctor123",
+      "role": "doctor",
+      "specialty": "General Physician",
+      "hospital": "St. Jude Memorial Hospital",
+      "license": "MED-499201"
+    }
+  ],
+  "vitals": [
+    {
+      "patient_id": "CN-88492",
+      "date": "2026-09-07 08:30 AM",
+      "bp": "120/80",
+      "hr": 74,
+      "glucose": 96,
+      "spo2": 99,
+      "status": "Normal"
+    },
+    {
+      "patient_id": "CN-88492",
+      "date": "2026-09-05 06:15 PM",
+      "bp": "124/82",
+      "hr": 78,
+      "glucose": 104,
+      "spo2": 98,
+      "status": "Normal"
+    },
+    {
+      "patient_id": "CN-88492",
+      "date": "2026-09-02 09:00 AM",
+      "bp": "135/88",
+      "hr": 82,
+      "glucose": 112,
+      "spo2": 98,
+      "status": "Elevated"
+    },
+    {
+      "patient_id": "CN-88492",
+      "date": "2026-08-28 08:15 AM",
+      "bp": "122/80",
+      "hr": 72,
+      "glucose": 98,
+      "spo2": 99,
+      "status": "Normal"
+    }
+  ],
+  "medications": [
+    {
+      "id": "m1",
+      "patient_id": "CN-88492",
+      "name": "Metformin 500mg",
+      "frequency": "Twice daily with meals",
+      "purpose": "Pre-diabetes blood glucose control"
+    },
+    {
+      "patient_id": "CN-88492",
+      "id": "m2",
+      "name": "Albuterol Inhaler (90mcg)",
+      "frequency": "As needed (PRN)",
+      "purpose": "Asthma rescue inhaler for bronchospasms"
+    },
+    {
+      "patient_id": "CN-88492",
+      "id": "m3",
+      "name": "Vitamin D3 (2000 IU)",
+      "frequency": "Once daily in morning",
+      "purpose": "Nutritional bone & immune support"
+    }
+  ],
+  "doctors": [
+    {
+      "id": "d1",
+      "name": "Dr. Evelyn Reed, MD",
+      "specialty": "General Physician",
+      "experience": "14 years exp.",
+      "hospital": "St. Jude Memorial Hospital",
+      "rating": "4.9 ★ (180+ reviews)",
+      "availability": "Today & Tomorrow"
+    },
+    {
+      "id": "d2",
+      "name": "Dr. Marcus Vance, FACC",
+      "specialty": "Cardiologist",
+      "experience": "18 years exp.",
+      "hospital": "Metro Heart & Vascular Institute",
+      "rating": "4.95 ★ (240+ reviews)",
+      "availability": "Tomorrow, 10:00 AM"
+    },
+    {
+      "id": "d3",
+      "name": "Dr. Sophia Chen, MD",
+      "specialty": "Gastroenterologist",
+      "experience": "12 years exp.",
+      "hospital": "City Center Digestive Health",
+      "rating": "4.85 ★ (110+ reviews)",
+      "availability": "Wednesday, 02:00 PM"
+    }
+  ]
+}

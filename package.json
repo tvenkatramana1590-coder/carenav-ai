@@ -1,0 +1,14 @@
+{
+  "name": "mern-carenav-project",
+  "version": "1.0.0",
+  "description": "CareNav AI Healthcare and MERN Web Workspace",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "npm --prefix healthcare-system install",
+    "start": "npm --prefix healthcare-system start",
+    "dev": "npm --prefix healthcare-system run dev",
+    "test:api": "npm --prefix healthcare-system run test:api"
+  }
+}

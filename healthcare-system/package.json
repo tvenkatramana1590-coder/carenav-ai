@@ -1,0 +1,32 @@
+{
+  "name": "carenav-ai-healthcare",
+  "version": "1.0.0",
+  "description": "CareNav AI — Healthcare Record, EHR & Clinical Care Navigation System Backend API",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "seed": "node server/seed.js",
+    "test:api": "node server/test_api.js"
+  },
+  "keywords": [
+    "healthcare",
+    "ehr",
+    "telehealth",
+    "triage",
+    "sqlite",
+    "express",
+    "mern"
+  ],
+  "author": "CareNav AI",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "localtunnel": "^2.0.2"
+  }
+}
