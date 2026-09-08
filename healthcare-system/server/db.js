@@ -2,12 +2,12 @@ const { DatabaseSync } = require('node:sqlite');
 const path = require('node:path');
 const fs = require('node:fs');
 
-const DB_DIR = path.resolve(__dirname, '../database');
+const DB_DIR = process.env.VERCEL ? '/tmp' : path.resolve(__dirname, '../database');
 const DB_PATH = path.join(DB_DIR, 'carenav.db');
-const SEED_DATA_PATH = path.join(DB_DIR, 'data.json');
+const SEED_DATA_PATH = path.resolve(__dirname, '../database/data.json');
 
 if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
+    try { fs.mkdirSync(DB_DIR, { recursive: true }); } catch (e) {}
 }
 
 let dbInstance = null;

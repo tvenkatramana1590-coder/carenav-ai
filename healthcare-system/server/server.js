@@ -75,15 +75,17 @@ app.use((err, req, res, next) => {
     res.status(500).json({ success: false, error: 'Internal server error', details: err.message });
 });
 
-app.listen(PORT, () => {
-    console.log(`\n=============================================================`);
-    console.log(`  🏥 CareNav AI Healthcare System — Express & SQLite Server`);
-    console.log(`=============================================================`);
-    console.log(`  🚀 Web Application : http://localhost:${PORT}`);
-    console.log(`  📡 REST API Base   : http://localhost:${PORT}/api`);
-    console.log(`  📊 System Health   : http://localhost:${PORT}/api/health`);
-    console.log(`  💾 Database Engine : SQLite (${DB_PATH})`);
-    console.log(`=============================================================\n`);
-});
+if (!process.env.VERCEL && require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`\n=============================================================`);
+        console.log(`  🏥 CareNav AI Healthcare System — Express & SQLite Server`);
+        console.log(`=============================================================`);
+        console.log(`  🚀 Web Application : http://localhost:${PORT}`);
+        console.log(`  📡 REST API Base   : http://localhost:${PORT}/api`);
+        console.log(`  📊 System Health   : http://localhost:${PORT}/api/health`);
+        console.log(`  💾 Database Engine : SQLite (${DB_PATH})`);
+        console.log(`=============================================================\n`);
+    });
+}
 
 module.exports = app;

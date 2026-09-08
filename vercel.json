@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "buildCommand": "npm --prefix healthcare-system install",
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/",
+      "destination": "/healthcare-system/index.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/healthcare-system/$1"
+    }
+  ]
+}
