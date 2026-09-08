@@ -6,7 +6,6 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "build": "npm --prefix healthcare-system install",
     "start": "node healthcare-system/server/server.js",
     "dev": "npm --prefix healthcare-system run dev",
     "test:api": "npm --prefix healthcare-system run test:api"
