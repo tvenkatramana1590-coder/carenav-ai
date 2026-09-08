@@ -32,7 +32,15 @@ router.get('/:patientId', (req, res) => {
 // POST /api/vitals
 router.post('/', (req, res) => {
     try {
-        const { patientId, sys, dia, hr, glucose, spo2, date } = req.body;
+        let { patientId, sys, dia, bp, hr, glucose, spo2, date } = req.body;
+
+        if (bp && (sys === undefined || dia === undefined)) {
+            const parts = String(bp).split('/');
+            if (parts.length === 2) {
+                sys = parts[0].trim();
+                dia = parts[1].trim();
+            }
+        }
 
         if (!patientId || sys === undefined || dia === undefined || hr === undefined || glucose === undefined || spo2 === undefined) {
             return res.status(400).json({ success: false, message: 'All vital parameters (sys, dia, hr, glucose, spo2) are required.' });

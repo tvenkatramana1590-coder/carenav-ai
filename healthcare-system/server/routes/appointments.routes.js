@@ -55,9 +55,10 @@ router.get('/doctor/:doctorId', (req, res) => {
 // POST /api/appointments
 router.post('/', (req, res) => {
     try {
-        const { patientId, doctorId, doctorName, specialty, date, slot, notes } = req.body;
+        const { patientId, doctorId, doctorName, specialty, date, slot, time, time_slot, timeSlot, notes } = req.body;
+        const resolvedSlot = slot || time || time_slot || timeSlot;
 
-        if (!patientId || !doctorName || !date || !slot) {
+        if (!patientId || !doctorName || !date || !resolvedSlot) {
             return res.status(400).json({ success: false, message: 'Patient, Doctor, Date, and Time Slot are required.' });
         }
 
@@ -67,7 +68,7 @@ router.post('/', (req, res) => {
         db.prepare(`
             INSERT INTO appointments (id, patient_id, doctor_id, doctor_name, specialty, appointment_date, time_slot, notes, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Confirmed')
-        `).run(id, patientId, doctorId || null, doctorName, specialty || 'General Medicine', date, slot, notes || 'General Consultation');
+        `).run(id, patientId, doctorId || null, doctorName, specialty || 'General Medicine', date, resolvedSlot, notes || 'General Consultation');
 
         res.status(201).json({
             success: true,
