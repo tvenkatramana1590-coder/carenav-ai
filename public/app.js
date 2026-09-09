@@ -263,6 +263,192 @@ const CareNavAPI = {
     }
 };
 
+
+// ================= SUPABASE CLOUD DATABASE CLIENT (POSTGRESQL) =================
+const CareNavSupabase = {
+    client: null,
+    isReady: false,
+    url: '',
+    key: '',
+
+    init() {
+        this.url = localStorage.getItem('carenav_supabase_url') || '';
+        this.key = localStorage.getItem('carenav_supabase_key') || '';
+        if (this.url && this.key && typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
+            try {
+                this.client = window.supabase.createClient(this.url, this.key);
+                this.isReady = true;
+                this.updateBadge(true);
+                return true;
+            } catch (err) {
+                console.warn('Supabase initialization warning:', err.message);
+                this.updateBadge(false);
+            }
+        } else {
+            this.updateBadge(false);
+        }
+        return false;
+    },
+
+    updateBadge(connected) {
+        const badge = document.getElementById('supabaseStatusBadge');
+        const dot = document.getElementById('supabaseStatusDot');
+        const text = document.getElementById('supabaseStatusText');
+        const settingsBadge = document.getElementById('supabaseSettingsBadge');
+
+        if (connected) {
+            if (badge) {
+                badge.style.background = 'rgba(59, 130, 246, 0.15)';
+                badge.style.color = '#2563eb';
+                badge.style.borderColor = 'rgba(59, 130, 246, 0.4)';
+            }
+            if (dot) dot.style.background = '#2563eb';
+            if (text) text.innerHTML = '<i class="fa-solid fa-cloud-bolt"></i> Supabase Cloud Active';
+            if (settingsBadge) {
+                settingsBadge.textContent = 'Connected (Live PostgreSQL)';
+                settingsBadge.style.background = 'rgba(34, 197, 94, 0.15)';
+                settingsBadge.style.color = '#16a34a';
+            }
+        } else {
+            if (badge) {
+                badge.style.background = 'rgba(148, 163, 184, 0.12)';
+                badge.style.color = '#64748b';
+                badge.style.borderColor = 'rgba(148, 163, 184, 0.3)';
+            }
+            if (dot) dot.style.background = '#94a3b8';
+            if (text) text.innerHTML = '<i class="fa-solid fa-cloud"></i> Supabase Cloud (Connect)';
+            if (settingsBadge) {
+                settingsBadge.textContent = 'Not Connected';
+                settingsBadge.style.background = '#e2e8f0';
+                settingsBadge.style.color = '#475569';
+            }
+        }
+    },
+
+    async test(url, key) {
+        if (!url || !key) return { success: false, message: 'Supabase URL and Anon API Key are required.' };
+        if (typeof window === 'undefined' || !window.supabase || !window.supabase.createClient) {
+            return { success: false, message: 'Supabase JS SDK not loaded yet. Check internet connection.' };
+        }
+        try {
+            const testClient = window.supabase.createClient(url, key);
+            const { data, error } = await testClient.from('users').select('count', { count: 'exact', head: true });
+            if (error) {
+                if (error.code === '42P01' || (error.message && error.message.includes('does not exist'))) {
+                    return { success: true, message: 'Connected to Supabase! (Database tables not yet created — copy & run supabase_schema.sql in Supabase SQL Editor)' };
+                }
+                return { success: false, message: error.message };
+            }
+            return { success: true, message: 'Successfully connected to Supabase PostgreSQL cloud database!' };
+        } catch (e) {
+            return { success: false, message: e.message };
+        }
+    },
+
+    async syncVital(vital) {
+        if (!this.isReady || !this.client) return null;
+        try {
+            const { data, error } = await this.client.from('vitals').insert({
+                patient_id: vital.patientId || vital.patient_id,
+                systolic_bp: vital.sys || vital.systolic_bp,
+                diastolic_bp: vital.dia || vital.diastolic_bp,
+                heart_rate: vital.hr || vital.heart_rate,
+                glucose_mg_dl: vital.glucose || vital.glucose_mg_dl,
+                spo2_percent: vital.spo2 || vital.spo2_percent,
+                status: vital.status || 'Normal'
+            });
+            if (error) console.warn('Supabase syncVital note:', error.message);
+            return data;
+        } catch (e) {
+            console.warn('Supabase syncVital error:', e.message);
+            return null;
+        }
+    },
+
+    async syncMedication(med) {
+        if (!this.isReady || !this.client) return null;
+        try {
+            const { data, error } = await this.client.from('medications').upsert({
+                id: med.id || ('m-' + Date.now()),
+                patient_id: med.patientId || med.patient_id,
+                name: med.name,
+                frequency: med.frequency,
+                purpose: med.purpose,
+                is_active: true
+            });
+            if (error) console.warn('Supabase syncMedication note:', error.message);
+            return data;
+        } catch (e) {
+            console.warn('Supabase syncMedication error:', e.message);
+            return null;
+        }
+    },
+
+    async syncAppointment(appt) {
+        if (!this.isReady || !this.client) return null;
+        try {
+            const { data, error } = await this.client.from('appointments').upsert({
+                id: appt.id || ('apt-' + Date.now()),
+                patient_id: appt.patientId || appt.patient_id,
+                doctor_id: appt.doctorId || appt.doctor_id || 'DOC-1029',
+                doctor_name: appt.doctorName || appt.doctor_name || 'Dr. Evelyn Reed, MD',
+                specialty: appt.specialty || 'General Physician',
+                appointment_date: appt.date || appt.appointment_date,
+                time_slot: appt.slot || appt.time_slot,
+                notes: appt.notes || '',
+                status: appt.status || 'Confirmed'
+            });
+            if (error) console.warn('Supabase syncAppointment note:', error.message);
+            return data;
+        } catch (e) {
+            console.warn('Supabase syncAppointment error:', e.message);
+            return null;
+        }
+    },
+
+    async syncAllLocalData() {
+        if (!this.isReady || !this.client) {
+            throw new Error('Supabase is not connected. Please enter URL and Key first.');
+        }
+
+        const users = JSON.parse(localStorage.getItem('carenav_users') || '[]');
+        const vitals = JSON.parse(localStorage.getItem('carenav_vitals') || '[]');
+        const meds = JSON.parse(localStorage.getItem('carenav_meds') || '[]');
+        const appts = JSON.parse(localStorage.getItem('carenav_appts') || '[]');
+
+        let count = 0;
+        for (const u of users) {
+            if (u.role === 'patient') {
+                await this.client.from('patients').upsert({
+                    patient_id: u.id,
+                    user_id: u.id,
+                    age: u.age || 34,
+                    gender: u.gender || 'Male',
+                    blood_group: u.bloodGroup || 'O Positive (Rh+)',
+                    allergies: Array.isArray(u.allergies) ? u.allergies.join(', ') : (u.allergies || ''),
+                    chronic_conditions: Array.isArray(u.chronicConditions) ? u.chronicConditions.join(', ') : (u.chronicConditions || ''),
+                    emergency_contact: u.emergencyContact || '',
+                    primary_physician: u.primaryCarePhysician || ''
+                });
+                count++;
+            }
+        }
+        for (const v of vitals) {
+            await this.syncVital(v);
+            count++;
+        }
+        for (const m of meds) {
+            await this.syncMedication(m);
+            count++;
+        }
+        for (const a of appts) {
+            await this.syncAppointment(a);
+            count++;
+        }
+        return count;
+    }
+};
+
 // ================= MODERN CLINICAL TOAST NOTIFICATIONS =================
 function showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
@@ -540,6 +726,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Check backend API connection
     await CareNavAPI.checkHealth();
+    CareNavSupabase.init();
 
     // Check login state
     const current = JSON.parse(localStorage.getItem('carenav_current_user') || 'null');
@@ -1632,6 +1819,13 @@ function initModals() {
             });
         }
 
+        if (CareNavSupabase.isReady && activeUser) {
+            CareNavSupabase.syncVital({
+                patientId: activeUser.id,
+                sys, dia, hr, glucose: gl, spo2
+            });
+        }
+
         localStorage.setItem('carenav_vitals', JSON.stringify(HealthDB.vitals));
         renderVitals();
         addVitalModal.classList.remove('open');
@@ -1672,6 +1866,10 @@ function initModals() {
             }).then(res => {
                 if (res && res.success) console.log('Medication recorded in SQLite:', res.medication);
             });
+        }
+
+        if (CareNavSupabase.isReady && activeUser) {
+            CareNavSupabase.syncMedication({ id: medObj.id, patientId: activeUser.id, name, frequency: freq, purpose });
         }
 
         localStorage.setItem('carenav_meds', JSON.stringify(HealthDB.medications));
@@ -1718,12 +1916,16 @@ function initModals() {
             });
         }
 
+        if (CareNavSupabase.isReady && activeUser) {
+            CareNavSupabase.syncAppointment({ id: record.id, patientId: activeUser.id, doctorId: activeBookingDoctor ? activeBookingDoctor.id : 'DOC-1029', doctorName: record.doctor, specialty: record.specialty, date: record.date, slot: record.slot, notes: record.notes });
+        }
+
         localStorage.setItem('carenav_appts', JSON.stringify(HealthDB.appointments));
         bookingModal.classList.remove('open');
         showToast(`Appointment confirmed with ${record.doctor} on ${record.date} at ${record.slot}!`, 'success');
     });
 
-    // Settings Modal
+    // Settings Modal & Supabase Cloud Database Configuration
     const settingsModal = document.getElementById('settingsModal');
     const openSettingsBtn = document.getElementById('openSettingsBtn');
     const closeSettingsBtn = document.getElementById('closeSettingsModal');
@@ -1731,27 +1933,178 @@ function initModals() {
     const saveKeyBtn = document.getElementById('saveKeyBtn');
     const removeKeyBtn = document.getElementById('removeKeyBtn');
 
-    openSettingsBtn.addEventListener('click', () => {
-        geminiInput.value = HealthDB.geminiApiKey;
-        settingsModal.classList.add('open');
-    });
+    // Supabase Settings elements
+    const supabaseUrlInput = document.getElementById('supabaseUrl');
+    const supabaseKeyInput = document.getElementById('supabaseKey');
+    const testSupabaseBtn = document.getElementById('testSupabaseBtn');
+    const saveSupabaseBtn = document.getElementById('saveSupabaseBtn');
+    const syncSupabaseNowBtn = document.getElementById('syncSupabaseNowBtn');
+    const removeSupabaseBtn = document.getElementById('removeSupabaseBtn');
+    const supabaseTestStatus = document.getElementById('supabaseTestStatus');
+    const supabaseStatusBadge = document.getElementById('supabaseStatusBadge');
+    const openSupabaseSettingsFromDbBtn = document.getElementById('openSupabaseSettingsFromDbBtn');
 
-    closeSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('open'));
+    function refreshSettingsModal() {
+        if (geminiInput) geminiInput.value = HealthDB.geminiApiKey || '';
+        if (supabaseUrlInput) supabaseUrlInput.value = localStorage.getItem('carenav_supabase_url') || '';
+        if (supabaseKeyInput) supabaseKeyInput.value = localStorage.getItem('carenav_supabase_key') || '';
+        if (supabaseTestStatus) supabaseTestStatus.style.display = 'none';
 
-    saveKeyBtn.addEventListener('click', () => {
-        const val = geminiInput.value.trim();
-        HealthDB.geminiApiKey = val;
-        localStorage.setItem('carenav_gemini_key', val);
-        showToast('Gemini API Key saved securely.', 'success');
-        settingsModal.classList.remove('open');
-    });
+        const isConfigured = Boolean(localStorage.getItem('carenav_supabase_url') && localStorage.getItem('carenav_supabase_key'));
+        if (syncSupabaseNowBtn) syncSupabaseNowBtn.style.display = isConfigured ? 'inline-flex' : 'none';
+        if (removeSupabaseBtn) removeSupabaseBtn.style.display = isConfigured ? 'inline-flex' : 'none';
+    }
 
-    removeKeyBtn.addEventListener('click', () => {
-        HealthDB.geminiApiKey = '';
-        localStorage.removeItem('carenav_gemini_key');
-        geminiInput.value = '';
-        showToast('Gemini API Key removed.', 'info');
-    });
+    if (openSettingsBtn) {
+        openSettingsBtn.addEventListener('click', () => {
+            refreshSettingsModal();
+            settingsModal.classList.add('open');
+        });
+    }
+
+    if (supabaseStatusBadge) {
+        supabaseStatusBadge.addEventListener('click', () => {
+            refreshSettingsModal();
+            settingsModal.classList.add('open');
+        });
+    }
+
+    if (openSupabaseSettingsFromDbBtn) {
+        openSupabaseSettingsFromDbBtn.addEventListener('click', () => {
+            const dbModal = document.getElementById('databaseModal');
+            if (dbModal) dbModal.classList.remove('open');
+            refreshSettingsModal();
+            settingsModal.classList.add('open');
+        });
+    }
+
+    if (closeSettingsBtn) {
+        closeSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('open'));
+    }
+
+    if (saveKeyBtn) {
+        saveKeyBtn.addEventListener('click', () => {
+            const val = geminiInput.value.trim();
+            HealthDB.geminiApiKey = val;
+            localStorage.setItem('carenav_gemini_key', val);
+            showToast('Gemini API Key saved securely.', 'success');
+            settingsModal.classList.remove('open');
+        });
+    }
+
+    if (removeKeyBtn) {
+        removeKeyBtn.addEventListener('click', () => {
+            HealthDB.geminiApiKey = '';
+            localStorage.removeItem('carenav_gemini_key');
+            geminiInput.value = '';
+            showToast('Gemini API Key removed.', 'info');
+        });
+    }
+
+    if (testSupabaseBtn) {
+        testSupabaseBtn.addEventListener('click', async () => {
+            const url = supabaseUrlInput ? supabaseUrlInput.value.trim() : '';
+            const key = supabaseKeyInput ? supabaseKeyInput.value.trim() : '';
+
+            if (!url || !key) {
+                if (supabaseTestStatus) {
+                    supabaseTestStatus.style.display = 'block';
+                    supabaseTestStatus.style.background = 'rgba(239, 68, 68, 0.1)';
+                    supabaseTestStatus.style.color = 'var(--danger)';
+                    supabaseTestStatus.textContent = 'Please enter both the Supabase URL and Anon API Key.';
+                }
+                return;
+            }
+
+            testSupabaseBtn.disabled = true;
+            testSupabaseBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Testing...';
+            if (supabaseTestStatus) {
+                supabaseTestStatus.style.display = 'block';
+                supabaseTestStatus.style.background = 'rgba(59, 130, 246, 0.1)';
+                supabaseTestStatus.style.color = '#2563eb';
+                supabaseTestStatus.textContent = 'Verifying connection to Supabase PostgreSQL cluster...';
+            }
+
+            const result = await CareNavSupabase.test(url, key);
+            testSupabaseBtn.disabled = false;
+            testSupabaseBtn.innerHTML = '<i class="fa-solid fa-plug"></i> Test Connection';
+
+            if (supabaseTestStatus) {
+                supabaseTestStatus.style.display = 'block';
+                if (result.success) {
+                    supabaseTestStatus.style.background = 'rgba(34, 197, 94, 0.1)';
+                    supabaseTestStatus.style.color = '#16a34a';
+                    supabaseTestStatus.textContent = '✅ ' + result.message;
+                } else {
+                    supabaseTestStatus.style.background = 'rgba(239, 68, 68, 0.1)';
+                    supabaseTestStatus.style.color = 'var(--danger)';
+                    supabaseTestStatus.textContent = '❌ Connection failed: ' + result.message;
+                }
+            }
+        });
+    }
+
+    if (saveSupabaseBtn) {
+        saveSupabaseBtn.addEventListener('click', async () => {
+            const url = supabaseUrlInput ? supabaseUrlInput.value.trim() : '';
+            const key = supabaseKeyInput ? supabaseKeyInput.value.trim() : '';
+
+            if (!url || !key) {
+                showToast('Please enter both Supabase URL and Anon API Key.', 'warning');
+                return;
+            }
+
+            saveSupabaseBtn.disabled = true;
+            saveSupabaseBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connecting...';
+
+            const testResult = await CareNavSupabase.test(url, key);
+            saveSupabaseBtn.disabled = false;
+            saveSupabaseBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save & Connect';
+
+            localStorage.setItem('carenav_supabase_url', url);
+            localStorage.setItem('carenav_supabase_key', key);
+            CareNavSupabase.init();
+
+            if (testResult.success) {
+                showToast('Supabase PostgreSQL Cloud Database connected successfully!', 'success');
+            } else {
+                showToast('Credentials saved! Note: ' + testResult.message, 'warning');
+            }
+
+            refreshSettingsModal();
+            settingsModal.classList.remove('open');
+        });
+    }
+
+    if (removeSupabaseBtn) {
+        removeSupabaseBtn.addEventListener('click', () => {
+            localStorage.removeItem('carenav_supabase_url');
+            localStorage.removeItem('carenav_supabase_key');
+            CareNavSupabase.client = null;
+            CareNavSupabase.isReady = false;
+            CareNavSupabase.updateBadge(false);
+            if (supabaseUrlInput) supabaseUrlInput.value = '';
+            if (supabaseKeyInput) supabaseKeyInput.value = '';
+            refreshSettingsModal();
+            showToast('Supabase Cloud Database disconnected. Reverted to SQLite.', 'info');
+        });
+    }
+
+    if (syncSupabaseNowBtn) {
+        syncSupabaseNowBtn.addEventListener('click', async () => {
+            syncSupabaseNowBtn.disabled = true;
+            syncSupabaseNowBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing...';
+            try {
+                const syncedCount = await CareNavSupabase.syncAllLocalData();
+                showToast('Synchronized ' + syncedCount + ' records to Supabase PostgreSQL!', 'success');
+            } catch (err) {
+                showToast('Sync failed: ' + err.message, 'error');
+            } finally {
+                syncSupabaseNowBtn.disabled = false;
+                syncSupabaseNowBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Sync Data Now';
+            }
+        });
+    }
 
     // Database Modal & Live Inspector
     const databaseModal = document.getElementById('databaseModal');
@@ -1805,6 +2158,103 @@ CREATE TABLE appointments (
     status VARCHAR(20) DEFAULT 'Confirmed'
 );`;
 
+    const supabaseSqlSchemaText = `-- ==========================================================
+-- CareNav AI Enterprise Supabase PostgreSQL Schema
+-- Run in Supabase Dashboard > SQL Editor > New Query
+-- File: healthcare-system/database/supabase_schema.sql
+-- ==========================================================
+
+-- 1. USERS TABLE
+CREATE TABLE IF NOT EXISTS public.users (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL DEFAULT 'password123',
+    role TEXT NOT NULL CHECK (role IN ('patient', 'doctor', 'admin')),
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- 2. PATIENTS TABLE
+CREATE TABLE IF NOT EXISTS public.patients (
+    patient_id TEXT PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    age INTEGER CHECK (age > 0),
+    gender TEXT DEFAULT 'Not specified',
+    blood_group TEXT NOT NULL DEFAULT 'O Positive (Rh+)',
+    allergies TEXT DEFAULT 'None reported',
+    chronic_conditions TEXT DEFAULT 'None recorded',
+    emergency_contact TEXT,
+    primary_physician TEXT DEFAULT 'Dr. Evelyn Reed (St. Jude Hospital)',
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- 3. DOCTORS TABLE
+CREATE TABLE IF NOT EXISTS public.doctors (
+    doctor_id TEXT PRIMARY KEY REFERENCES public.users(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    specialty TEXT NOT NULL,
+    license_number TEXT UNIQUE NOT NULL,
+    hospital_affiliation TEXT DEFAULT 'St. Jude Memorial Hospital',
+    experience_years INTEGER DEFAULT 10,
+    rating NUMERIC(3, 2) DEFAULT 4.90,
+    icon TEXT DEFAULT 'fa-user-doctor',
+    availability TEXT DEFAULT 'Today & Tomorrow',
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- 4. VITALS TABLE
+CREATE TABLE IF NOT EXISTS public.vitals (
+    id BIGSERIAL PRIMARY KEY,
+    patient_id TEXT NOT NULL REFERENCES public.patients(patient_id) ON DELETE CASCADE,
+    systolic_bp INTEGER NOT NULL,
+    diastolic_bp INTEGER NOT NULL,
+    heart_rate INTEGER NOT NULL,
+    glucose_mg_dl INTEGER NOT NULL,
+    spo2_percent INTEGER NOT NULL,
+    status TEXT DEFAULT 'Normal' CHECK (status IN ('Normal', 'Elevated', 'High', 'Critical')),
+    recorded_at TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- 5. MEDICATIONS TABLE
+CREATE TABLE IF NOT EXISTS public.medications (
+    id TEXT PRIMARY KEY,
+    patient_id TEXT NOT NULL REFERENCES public.patients(patient_id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    frequency TEXT NOT NULL,
+    purpose TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    prescribed_at TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- 6. APPOINTMENTS TABLE
+CREATE TABLE IF NOT EXISTS public.appointments (
+    id TEXT PRIMARY KEY,
+    patient_id TEXT NOT NULL REFERENCES public.patients(patient_id) ON DELETE CASCADE,
+    doctor_id TEXT REFERENCES public.doctors(doctor_id) ON DELETE SET NULL,
+    doctor_name TEXT NOT NULL,
+    specialty TEXT NOT NULL,
+    appointment_date DATE NOT NULL,
+    time_slot TEXT NOT NULL,
+    notes TEXT DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'Confirmed' CHECK (status IN ('Confirmed', 'In Progress', 'Completed', 'Cancelled')),
+    created_at TIMESTAMPTZ DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- 7. ENABLE ROW LEVEL SECURITY (RLS)
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.patients ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.doctors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vitals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.medications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.appointments ENABLE ROW LEVEL SECURITY;
+
+-- 8. REALTIME REPLICATION PUBLICATION
+ALTER PUBLICATION supabase_realtime ADD TABLE public.vitals;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.appointments;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.medications;`;
+
+
     async function renderDatabaseTab(tab) {
         if (!dbViewer) return;
         if (CareNavAPI.isOnline) {
@@ -1846,6 +2296,13 @@ CREATE TABLE appointments (
                 } else if (tab === 'schema') {
                     dbViewer.textContent = sqlSchemaText;
                     return;
+                } else if (tab === 'supabase') {
+                    const isConfig = Boolean(localStorage.getItem('carenav_supabase_url') && localStorage.getItem('carenav_supabase_key'));
+                    const header = isConfig
+                        ? '-- [STATUS: CONNECTED] Supabase PostgreSQL Cloud is Active\n-- Project URL: ' + localStorage.getItem('carenav_supabase_url') + '\n\n'
+                        : '-- [STATUS: UNCONFIGURED] Click "Supabase Settings" below to connect your project\n\n';
+                    dbViewer.textContent = header + supabaseSqlSchemaText;
+                    return;
                 }
             } catch (err) {
                 console.warn('Live SQLite query failed, falling back to local storage:', err);
@@ -1867,6 +2324,12 @@ CREATE TABLE appointments (
             dbViewer.textContent = JSON.stringify(appts, null, 2);
         } else if (tab === 'schema') {
             dbViewer.textContent = sqlSchemaText;
+        } else if (tab === 'supabase') {
+            const isConfig = Boolean(localStorage.getItem('carenav_supabase_url') && localStorage.getItem('carenav_supabase_key'));
+            const header = isConfig
+                ? '-- [STATUS: CONNECTED] Supabase PostgreSQL Cloud is Active\n-- Project URL: ' + localStorage.getItem('carenav_supabase_url') + '\n\n'
+                : '-- [STATUS: UNCONFIGURED] Click "Supabase Settings" below to connect your project\n\n';
+            dbViewer.textContent = header + supabaseSqlSchemaText;
         }
     }
 

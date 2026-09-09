@@ -7,6 +7,8 @@
     <title>CareNav AI — Healthcare Record & Care Navigation System</title>
     <!-- Icons from FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase JS Client SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -201,6 +203,10 @@
             <div id="serverStatusBadge" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(13, 148, 136, 0.12); color: var(--teal); border: 1px solid rgba(13, 148, 136, 0.3);">
                 <span id="serverStatusDot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--teal); display: inline-block;"></span>
                 <span id="serverStatusText">SQLite Backend Online</span>
+            </div>
+            <div id="supabaseStatusBadge" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); cursor: pointer;" title="Supabase Cloud Database Status (Click to configure)">
+                <span id="supabaseStatusDot" style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span>
+                <span id="supabaseStatusText"><i class="fa-solid fa-cloud"></i> Supabase Cloud</span>
             </div>
             <div class="patient-badge" id="patientBadge">
                 <div class="avatar" id="navAvatar">
@@ -1126,26 +1132,66 @@
 
     <!-- Settings Modal -->
     <div class="modal-backdrop" id="settingsModal">
-        <div class="modal-card">
+        <div class="modal-card" style="max-width: 620px;">
             <div class="modal-header">
-                <h3><i class="fa-solid fa-gear"></i> System Settings & Gemini AI</h3>
+                <h3><i class="fa-solid fa-gear"></i> System Settings & Cloud Integrations</h3>
                 <button class="modal-close" id="closeSettingsModal">&times;</button>
             </div>
             <div class="modal-body">
-                <p>CareNav AI includes a built-in <strong>clinical decision-support logic engine</strong> that works completely offline with zero API key required.</p>
-                <p>You can optionally provide a free <strong>Google Gemini API key</strong> to unlock open-ended natural clinical conversation and deep biomedical research insights.</p>
+                <!-- Supabase Cloud PostgreSQL Card -->
+                <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(37, 99, 235, 0.08) 100%); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h4 style="margin: 0; color: #1d4ed8; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-cloud-bolt"></i> Supabase Cloud Database (PostgreSQL)
+                        </h4>
+                        <span id="supabaseSettingsBadge" style="font-size: 0.72rem; padding: 2px 8px; border-radius: 12px; background: #e2e8f0; color: #475569; font-weight: 600;">Not Connected</span>
+                    </div>
+                    <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 12px;">
+                        Connect your live Supabase cloud database for multi-device sync, real-time data replication, and enterprise PostgreSQL health records.
+                    </p>
 
-                <div class="form-group" style="margin-top: 14px;">
-                    <label for="geminiKey">Google Gemini API Key (Optional):</label>
-                    <input type="password" id="geminiKey" class="form-control" placeholder="AIzaSy...">
-                    <small style="color: var(--text-muted); display: block; margin-top: 4px;">
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <label for="supabaseUrl" style="font-size: 0.8rem; font-weight: 600;">Supabase Project URL</label>
+                        <input type="text" id="supabaseUrl" class="form-control" placeholder="https://your-project-id.supabase.co" style="font-size: 0.85rem;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label for="supabaseKey" style="font-size: 0.8rem; font-weight: 600;">Supabase Anon / Public API Key</label>
+                        <input type="password" id="supabaseKey" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." style="font-size: 0.85rem;">
+                        <small style="color: var(--text-muted); display: block; margin-top: 4px; font-size: 0.75rem;">
+                            Stored securely in your browser's <code>localStorage</code>.
+                        </small>
+                    </div>
+
+                    <div id="supabaseTestStatus" style="display: none; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 12px;"></div>
+
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-outline btn-sm" id="testSupabaseBtn"><i class="fa-solid fa-plug"></i> Test Connection</button>
+                        <button class="btn btn-primary btn-sm" id="saveSupabaseBtn" style="background: #2563eb; border-color: #2563eb;"><i class="fa-solid fa-floppy-disk"></i> Save & Connect</button>
+                        <button class="btn btn-outline btn-sm" id="syncSupabaseNowBtn" style="display: none; color: #16a34a; border-color: #16a34a;"><i class="fa-solid fa-arrows-rotate"></i> Sync Data Now</button>
+                        <button class="btn btn-outline btn-sm" id="removeSupabaseBtn" style="display: none; color: var(--danger);"><i class="fa-solid fa-trash"></i> Disconnect</button>
+                    </div>
+                </div>
+
+                <!-- Google Gemini AI Section -->
+                <h4 style="margin: 0 0 8px 0; color: var(--text-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-brain" style="color: var(--primary);"></i> Google Gemini Clinical AI
+                </h4>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 12px;">
+                    CareNav AI includes offline clinical decision logic by default. Enter an optional Gemini API key to unlock natural conversational reasoning and deep medical research.
+                </p>
+
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <label for="geminiKey" style="font-size: 0.8rem; font-weight: 600;">Google Gemini API Key (Optional):</label>
+                    <input type="password" id="geminiKey" class="form-control" placeholder="AIzaSy..." style="font-size: 0.85rem;">
+                    <small style="color: var(--text-muted); display: block; margin-top: 4px; font-size: 0.75rem;">
                         Stored locally in your browser's <code>localStorage</code>.
                     </small>
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
-                    <button class="btn btn-outline" id="removeKeyBtn">Remove Key</button>
-                    <button class="btn btn-primary" id="saveKeyBtn">Save Settings</button>
+                    <button class="btn btn-outline btn-sm" id="removeKeyBtn">Remove Gemini Key</button>
+                    <button class="btn btn-primary btn-sm" id="saveKeyBtn">Save Gemini Key</button>
                 </div>
             </div>
         </div>
@@ -1274,14 +1320,18 @@
                     <button class="btn btn-outline btn-sm db-tab-btn" data-table="vitals">Vitals Table</button>
                     <button class="btn btn-outline btn-sm db-tab-btn" data-table="medications">Medications</button>
                     <button class="btn btn-outline btn-sm db-tab-btn" data-table="appointments">Appointments</button>
-                    <button class="btn btn-outline btn-sm db-tab-btn" data-table="schema">SQL Schema (schema.sql)</button>
+                    <button class="btn btn-outline btn-sm db-tab-btn" data-table="schema">SQLite Schema</button>
+                    <button class="btn btn-outline btn-sm db-tab-btn" data-table="supabase" style="color: #2563eb; border-color: #93c5fd;"><i class="fa-solid fa-cloud"></i> Supabase SQL (PostgreSQL)</button>
                 </div>
 
                 <pre id="dbViewerContent" style="background: #0f172a; color: #38bdf8; padding: 16px; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.8rem; max-height: 360px; overflow: auto; border: 1px solid var(--border-color);"></pre>
 
-                <div style="margin-top: 14px; font-size: 0.78rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center;">
-                    <span>📁 Physical SQL file located at: <code>healthcare-system/database/schema.sql</code></span>
-                    <button class="btn btn-outline btn-sm" id="resetDemoDbBtn" style="color: var(--danger);"><i class="fa-solid fa-rotate-left"></i> Reset Demo Data</button>
+                <div style="margin-top: 14px; font-size: 0.78rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                    <span>📁 SQL files: <code>schema.sql</code> (SQLite) &bull; <code>supabase_schema.sql</code> (PostgreSQL)</span>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-outline btn-sm" id="openSupabaseSettingsFromDbBtn" style="color: #2563eb;"><i class="fa-solid fa-gear"></i> Supabase Settings</button>
+                        <button class="btn btn-outline btn-sm" id="resetDemoDbBtn" style="color: var(--danger);"><i class="fa-solid fa-rotate-left"></i> Reset Demo Data</button>
+                    </div>
                 </div>
             </div>
         </div>

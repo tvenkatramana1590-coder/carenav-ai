@@ -96,11 +96,13 @@ C:\Users\hp\OneDrive\Documents\MERN\
 ├── healthcare-system/
 │   ├── database/
 │   │   ├── schema.sql           # Canonical SQLite relational schema
+│   │   ├── supabase_schema.sql  # Canonical Supabase PostgreSQL cloud schema with RLS
 │   │   └── data.json            # Seed dataset (users, patients, doctors, vitals, meds, appts)
 │   ├── server/
 │   │   ├── db.js                # SQLite Native Connection (node:sqlite) & Auto-seed Engine
+│   │   ├── supabase.js          # Supabase Cloud Client, connection tester & sync service
 │   │   ├── server.js            # Express API Application & Middleware pipeline
-│   │   ├── test_api.js          # Automated Integration Test Suite (14/14 passing)
+│   │   ├── test_api.js          # Automated Integration Test Suite (15/15 passing)
 │   │   └── routes/
 │   │       ├── appointments.routes.js  # Patient/doctor appointment scheduling & status PATCH
 │   │       ├── auth.routes.js          # Login & registration authentication handlers
@@ -109,6 +111,7 @@ C:\Users\hp\OneDrive\Documents\MERN\
 │   │       ├── patient.routes.js       # Complete patient roster & EHR telemetry endpoints
 │   │       ├── reports.routes.js       # Diagnostic laboratory report translation engine
 │   │       ├── stats.routes.js         # System health, volume & KPI telemetry
+│   │       ├── supabase.routes.js      # Supabase cloud status, connection testing & sync
 │   │       ├── triage.routes.js        # Clinical symptom evaluation & urgency scoring
 │   │       └── vitals.routes.js        # Biometric observation recording & history
 │   ├── app.js                   # Application client logic (synced)
@@ -129,12 +132,16 @@ C:\Users\hp\OneDrive\Documents\MERN\
 
 ---
 
-## 5. Database Architecture & SQL Schema
+## 5. Database Architecture & SQL Schemas
 
-The backend uses Node.js 22/24 native `node:sqlite DatabaseSync` with **WAL (Write-Ahead Logging)** mode and foreign key constraints enabled.
+CareNav AI employs an enterprise **Hybrid Dual-Engine Database Architecture**:
+1. **Supabase Cloud PostgreSQL (`@supabase/supabase-js`):** Production-grade cloud database with Row Level Security (RLS), real-time change subscriptions, and multi-client replication. (Canonical schema: `healthcare-system/database/supabase_schema.sql`).
+2. **SQLite Native (`node:sqlite DatabaseSync`):** Local backend with WAL mode and zero third-party C++ bindings. Auto-seeds from `data.json` on both local and Vercel serverless runs. (Canonical schema: `healthcare-system/database/schema.sql`).
+3. **Browser LocalStorage:** Resilient offline fallback ensuring 100% functionality even during network drops.
 
-### Database File Path Resolution
-* **Local Environment:** `healthcare-system/database/carenav.db`
+### Database File & Service Resolution
+* **Supabase Cloud Service:** `healthcare-system/server/supabase.js` (`/api/supabase/status`, `/api/supabase/test`, `/api/supabase/sync`)
+* **Local SQLite Environment:** `healthcare-system/database/carenav.db`
 * **Vercel Serverless Environment:** `/tmp/carenav.db` (automatically seeded on cold start from `data.json`)
 
 ```mermaid

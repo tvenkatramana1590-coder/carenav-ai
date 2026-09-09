@@ -13,6 +13,7 @@ const appointmentsRoutes = require('./routes/appointments.routes');
 const triageRoutes = require('./routes/triage.routes');
 const reportsRoutes = require('./routes/reports.routes');
 const statsRoutes = require('./routes/stats.routes');
+const supabaseRoutes = require('./routes/supabase.routes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -45,6 +46,7 @@ app.use('/api/appointments', appointmentsRoutes);
 app.use('/api/triage', triageRoutes);
 app.use('/api/reports', reportsRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/supabase', supabaseRoutes);
 
 // Health Endpoint
 app.get('/api/health', (req, res) => {

@@ -199,6 +199,14 @@ async function runTests() {
                 }
             });
 
+            // Test 15: Supabase Cloud Status Endpoint
+            await assert('Supabase Status GET /api/supabase/status', async () => {
+                const res = await request('GET', '/api/supabase/status');
+                if (res.status !== 200 || !res.body.success || !res.body.mode) {
+                    throw new Error(`Supabase status failed: ${JSON.stringify(res.body)}`);
+                }
+            });
+
             console.log(`\n==============================================`);
             console.log(`  🏁 Tests Complete: ${passed} Passed, ${failed} Failed`);
             console.log(`==============================================\n`);
