@@ -183,6 +183,22 @@ async function runTests() {
                 }
             });
 
+            // Test 13: Doctor Patient Roster
+            await assert('Patient Roster GET /api/patient', async () => {
+                const res = await request('GET', '/api/patient');
+                if (res.status !== 200 || !Array.isArray(res.body.patients) || res.body.patients.length === 0) {
+                    throw new Error(`Patient roster failed: ${JSON.stringify(res.body)}`);
+                }
+            });
+
+            // Test 14: Doctor Appointments Queue
+            await assert('Doctor Appointments GET /api/appointments/doctor/DOC-1029', async () => {
+                const res = await request('GET', '/api/appointments/doctor/DOC-1029');
+                if (res.status !== 200 || !Array.isArray(res.body.appointments)) {
+                    throw new Error(`Doctor appointments failed: ${JSON.stringify(res.body)}`);
+                }
+            });
+
             console.log(`\n==============================================`);
             console.log(`  🏁 Tests Complete: ${passed} Passed, ${failed} Failed`);
             console.log(`==============================================\n`);

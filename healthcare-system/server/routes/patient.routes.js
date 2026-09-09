@@ -2,6 +2,48 @@ const express = require('express');
 const router = express.Router();
 const { getDb } = require('../db');
 
+// GET /api/patient (Doctor Patient Roster)
+router.get('/', (req, res) => {
+    try {
+        const db = getDb();
+        const rows = db.prepare(`
+            SELECT u.id, u.name, u.email, p.age, p.gender, p.blood_group, p.allergies, p.chronic_conditions, p.emergency_contact, p.primary_physician
+            FROM users u
+            JOIN patients p ON u.id = p.patient_id
+            WHERE u.role = 'patient'
+            ORDER BY u.created_at DESC
+        `).all();
+
+        const patientsWithVitals = rows.map(p => {
+            const latestVital = db.prepare('SELECT * FROM vitals WHERE patient_id = ? ORDER BY id DESC LIMIT 1').get(p.id);
+            const activeMeds = db.prepare('SELECT * FROM medications WHERE patient_id = ? AND is_active = 1').all(p.id);
+            return {
+                id: p.id,
+                name: p.name,
+                email: p.email,
+                age: p.age || 34,
+                gender: p.gender || 'Male',
+                bloodGroup: p.blood_group || 'O+',
+                allergies: p.allergies ? p.allergies.split(',').map(s => s.trim()) : [],
+                chronicConditions: p.chronic_conditions ? p.chronic_conditions.split(',').map(s => s.trim()) : [],
+                emergencyContact: p.emergency_contact || 'On file',
+                primaryPhysician: p.primary_physician || 'Dr. Evelyn Reed (St. Jude Hospital)',
+                latestVital: latestVital || null,
+                medicationsCount: activeMeds.length
+            };
+        });
+
+        res.json({
+            success: true,
+            count: patientsWithVitals.length,
+            patients: patientsWithVitals
+        });
+    } catch (err) {
+        console.error('Fetch all patients error:', err);
+        res.status(500).json({ success: false, message: 'Failed to retrieve patient roster.' });
+    }
+});
+
 // GET /api/patient/:id
 router.get('/:id', (req, res) => {
     try {

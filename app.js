@@ -223,6 +223,43 @@ const CareNavAPI = {
             if (res.ok) return await res.json();
         } catch (e) {}
         return null;
+    },
+
+    async getAllPatients() {
+        if (!this.isOnline) return null;
+        try {
+            const res = await fetch(`${this.baseURL}/patient`);
+            if (res.ok) {
+                const data = await res.json();
+                return data.patients;
+            }
+        } catch (e) {}
+        return null;
+    },
+
+    async getDoctorAppointments(doctorId) {
+        if (!this.isOnline) return null;
+        try {
+            const res = await fetch(`${this.baseURL}/appointments/doctor/${encodeURIComponent(doctorId)}`);
+            if (res.ok) {
+                const data = await res.json();
+                return data.appointments;
+            }
+        } catch (e) {}
+        return null;
+    },
+
+    async updateAppointmentStatus(id, status) {
+        if (!this.isOnline) return null;
+        try {
+            const res = await fetch(`${this.baseURL}/appointments/${encodeURIComponent(id)}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            if (res.ok) return await res.json();
+        } catch (e) {}
+        return null;
     }
 };
 
@@ -361,7 +398,131 @@ const HealthDB = {
     ],
 
     appointments: JSON.parse(localStorage.getItem('carenav_appts') || '[]'),
-    geminiApiKey: localStorage.getItem('carenav_gemini_key') || ''
+    geminiApiKey: localStorage.getItem('carenav_gemini_key') || '',
+
+    doctorPatients: JSON.parse(localStorage.getItem('carenav_doctor_patients') || JSON.stringify([
+        {
+            id: "CN-88492",
+            name: "Alex Morgan",
+            email: "alex.morgan@healthmail.com",
+            age: 34,
+            gender: "Male",
+            bloodGroup: "O Positive (Rh+)",
+            allergies: ["Penicillin", "Peanuts"],
+            chronicConditions: ["Mild Asthma", "Pre-diabetes"],
+            emergencyContact: "Sarah Morgan (Spouse) - +1 (555) 019-2834",
+            primaryCarePhysician: "Dr. Evelyn Reed (St. Jude Hospital)",
+            latest_vitals: { bp: "120/80", hr: 74, glucose: 96, spo2: 99, status: "Normal" },
+            medications_count: 3
+        },
+        {
+            id: "CN-73910",
+            name: "Sarah Jenkins",
+            email: "sarah.jenkins@healthmail.com",
+            age: 48,
+            gender: "Female",
+            bloodGroup: "A Positive (Rh+)",
+            allergies: ["Sulfa Drugs", "Codeine"],
+            chronicConditions: ["Hypertension", "Dyslipidemia"],
+            emergencyContact: "Robert Jenkins (Spouse) - +1 (555) 018-9123",
+            primaryCarePhysician: "Dr. Evelyn Reed (St. Jude Hospital)",
+            latest_vitals: { bp: "128/84", hr: 76, glucose: 102, spo2: 98, status: "Normal" },
+            medications_count: 1
+        },
+        {
+            id: "CN-51204",
+            name: "Marcus Bell",
+            email: "marcus.bell@healthmail.com",
+            age: 62,
+            gender: "Male",
+            bloodGroup: "B Positive (Rh+)",
+            allergies: ["Aspirin", "Iodine Contrast"],
+            chronicConditions: ["Type 2 Diabetes", "Coronary Artery Disease"],
+            emergencyContact: "David Bell (Son) - +1 (555) 012-4491",
+            primaryCarePhysician: "Dr. Evelyn Reed (St. Jude Hospital)",
+            latest_vitals: { bp: "142/92", hr: 88, glucose: 145, spo2: 96, status: "Elevated" },
+            medications_count: 2
+        }
+    ])),
+
+    doctorAppointments: JSON.parse(localStorage.getItem('carenav_doctor_appts') || JSON.stringify([
+        {
+            id: "apt-101",
+            patient_id: "CN-88492",
+            patient_name: "Alex Morgan",
+            doctor_id: "DOC-1029",
+            appointment_date: "2026-09-15",
+            time_slot: "10:00 AM",
+            notes: "Follow-up HbA1c review & asthma assessment",
+            type: "Telehealth Video Call",
+            status: "Confirmed"
+        },
+        {
+            id: "apt-102",
+            patient_id: "CN-73910",
+            patient_name: "Sarah Jenkins",
+            doctor_id: "DOC-1029",
+            appointment_date: "2026-09-15",
+            time_slot: "11:30 AM",
+            notes: "Hypertension blood pressure check and medication titration",
+            type: "In-Clinic Consultation",
+            status: "Confirmed"
+        },
+        {
+            id: "apt-103",
+            patient_id: "CN-51204",
+            patient_name: "Marcus Bell",
+            doctor_id: "DOC-1029",
+            appointment_date: "2026-09-16",
+            time_slot: "02:00 PM",
+            notes: "Cardiometabolic risk evaluation and lipid panel discussion",
+            type: "Telehealth Video Call",
+            status: "Confirmed"
+        }
+    ])),
+
+    doctorPrescriptions: JSON.parse(localStorage.getItem('carenav_doctor_prescriptions') || JSON.stringify([
+        {
+            id: "rx-201",
+            patient_id: "CN-88492",
+            patient_name: "Alex Morgan",
+            med_name: "Metformin 500mg",
+            dosage: "Twice daily with meals",
+            purpose: "Pre-diabetes glycemic control",
+            date: "2026-09-01",
+            status: "Active - Transmitted to Walgreens"
+        },
+        {
+            id: "rx-202",
+            patient_id: "CN-88492",
+            patient_name: "Alex Morgan",
+            med_name: "Albuterol Inhaler (90mcg)",
+            dosage: "2 puffs every 4-6h PRN",
+            purpose: "Bronchospasm rescue",
+            date: "2026-08-20",
+            status: "Active - Transmitted to CVS"
+        },
+        {
+            id: "rx-203",
+            patient_id: "CN-73910",
+            patient_name: "Sarah Jenkins",
+            med_name: "Lisinopril 10mg",
+            dosage: "Once daily in morning",
+            purpose: "Essential Hypertension",
+            date: "2026-09-03",
+            status: "Active - Transmitted to Walgreens"
+        },
+        {
+            id: "rx-204",
+            patient_id: "CN-51204",
+            patient_name: "Marcus Bell",
+            med_name: "Atorvastatin 20mg",
+            dosage: "Once daily at bedtime",
+            purpose: "Dyslipidemia & CAD prophylaxis",
+            date: "2026-08-15",
+            status: "Active - Transmitted to RiteAid"
+        }
+    ]))
 };
 
 // ================= DOM INITIALIZATION =================
@@ -375,6 +536,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     initExplainerModule();
     initChatModule();
     initModals();
+    initDoctorStation();
 
     // Check backend API connection
     await CareNavAPI.checkHealth();
@@ -424,54 +586,111 @@ async function loginUser(user, saveToStorage = true) {
         role: user.role || "patient"
     };
 
-    // Update Navbar Profile
+    // Update Navbar Profile & Portal Elements
     const nameEl = document.getElementById('currentPatientName');
     const subEl = document.getElementById('currentPatientSub');
     const avatarEl = document.getElementById('navAvatar');
     const badgeEl = document.getElementById('patientBadge');
+    const switchRoleBtn = document.getElementById('switchRoleBtn');
+    const switchRoleText = document.getElementById('switchRoleText');
+    const providerStatusBtn = document.getElementById('providerStatusBtn');
+    const emergencyCardBtn = document.getElementById('emergencyCardBtn');
+    const patientNavMenu = document.getElementById('patientNavMenu');
+    const doctorNavMenu = document.getElementById('doctorNavMenu');
+    const patientSidebarWidget = document.getElementById('patientSidebarWidget');
+    const doctorSidebarWidget = document.getElementById('doctorSidebarWidget');
+    const sidebarDisclaimerText = document.getElementById('sidebarDisclaimerText');
 
     if (nameEl) nameEl.textContent = user.name;
-    if (subEl) {
-        if (user.role === 'doctor') {
-            subEl.innerHTML = `Lic: #${user.license || user.id} &bull; ${user.specialty || 'Physician'}`;
-            if (avatarEl) avatarEl.innerHTML = '<i class="fa-solid fa-user-doctor"></i>';
-            if (badgeEl) badgeEl.style.borderColor = 'var(--teal)';
-        } else {
-            subEl.innerHTML = `ID: #${user.id} &bull; Age: ${user.age || 34} &bull; Blood: ${user.bloodGroup || 'O+'}`;
-            if (avatarEl) avatarEl.innerHTML = '<i class="fa-solid fa-user-injured"></i>';
-            if (badgeEl) badgeEl.style.borderColor = 'var(--border-color)';
+
+    const isDoctor = user.role === 'doctor';
+
+    if (isDoctor) {
+        if (subEl) subEl.innerHTML = `Lic: #${user.license || user.id || 'MED-499201'} &bull; ${user.specialty || 'Attending Physician'}`;
+        if (avatarEl) avatarEl.innerHTML = '<i class="fa-solid fa-user-doctor"></i>';
+        if (badgeEl) {
+            badgeEl.style.borderColor = 'var(--teal)';
+            badgeEl.title = 'Attending Physician Provider Station';
         }
+        if (patientNavMenu) patientNavMenu.style.display = 'none';
+        if (doctorNavMenu) doctorNavMenu.style.display = 'flex';
+        if (patientSidebarWidget) patientSidebarWidget.style.display = 'none';
+        if (doctorSidebarWidget) doctorSidebarWidget.style.display = 'block';
+        if (providerStatusBtn) providerStatusBtn.style.display = 'inline-flex';
+        if (emergencyCardBtn) emergencyCardBtn.style.display = 'none';
+        if (switchRoleBtn) switchRoleBtn.style.display = 'inline-flex';
+        if (switchRoleText) switchRoleText.textContent = 'Switch to Patient View';
+        if (sidebarDisclaimerText) sidebarDisclaimerText.textContent = 'Physician workstation active. Encrypted clinical access under HIPAA/HITECH regulations.';
+
+        // Select Doctor Station tab by default
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        const docDashNav = document.querySelector('#doctorNavMenu .nav-item[data-tab="doc-dashboard"]');
+        if (docDashNav) docDashNav.classList.add('active');
+        const docDashPane = document.getElementById('tab-doc-dashboard');
+        if (docDashPane) docDashPane.classList.add('active');
+
+        // Load Doctor station data
+        await renderDoctorStation();
+        await renderDoctorPatients();
+        await renderDoctorSchedule();
+        await renderDoctorPrescriptions();
+    } else {
+        if (subEl) subEl.innerHTML = `ID: #${user.id} &bull; Age: ${user.age || 34} &bull; Blood: ${user.bloodGroup || 'O+'}`;
+        if (avatarEl) avatarEl.innerHTML = '<i class="fa-solid fa-user-injured"></i>';
+        if (badgeEl) {
+            badgeEl.style.borderColor = 'var(--border-color)';
+            badgeEl.title = 'Patient Health Records';
+        }
+        if (patientNavMenu) patientNavMenu.style.display = 'flex';
+        if (doctorNavMenu) doctorNavMenu.style.display = 'none';
+        if (patientSidebarWidget) patientSidebarWidget.style.display = 'block';
+        if (doctorSidebarWidget) doctorSidebarWidget.style.display = 'none';
+        if (providerStatusBtn) providerStatusBtn.style.display = 'none';
+        if (emergencyCardBtn) emergencyCardBtn.style.display = 'inline-flex';
+        if (switchRoleBtn) switchRoleBtn.style.display = 'inline-flex';
+        if (switchRoleText) switchRoleText.textContent = 'Switch to Doctor Station';
+        if (sidebarDisclaimerText) sidebarDisclaimerText.textContent = 'CareNav AI assists with health management & navigation. In immediate life-threatening emergencies, call 911 or visit the nearest ER.';
+
+        // Select Triage tab by default
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        const triageNav = document.querySelector('#patientNavMenu .nav-item[data-tab="triage"]');
+        if (triageNav) triageNav.classList.add('active');
+        const triagePane = document.getElementById('tab-triage');
+        if (triagePane) triagePane.classList.add('active');
+
+        // Sync from SQLite if online
+        if (CareNavAPI.isOnline && user.id) {
+            try {
+                const [vitals, meds, appts, docs] = await Promise.all([
+                    CareNavAPI.getVitals(user.id),
+                    CareNavAPI.getMedications(user.id),
+                    CareNavAPI.getAppointments(user.id),
+                    CareNavAPI.getDoctors()
+                ]);
+                if (vitals && Array.isArray(vitals) && vitals.length > 0) {
+                    HealthDB.vitals = vitals;
+                }
+                if (meds && Array.isArray(meds) && meds.length > 0) {
+                    HealthDB.medications = meds;
+                }
+                if (appts && Array.isArray(appts) && appts.length > 0) {
+                    HealthDB.appointments = appts;
+                }
+                if (docs && Array.isArray(docs) && docs.length > 0) {
+                    HealthDB.doctors = docs;
+                }
+            } catch (e) {
+                console.warn('Sync with SQLite failed, using cached data:', e);
+            }
+        }
+
+        renderVitals();
+        renderMedications();
+        renderDoctors();
     }
 
-    // Sync from SQLite if online
-    if (CareNavAPI.isOnline && user.id) {
-        try {
-            const [vitals, meds, appts, docs] = await Promise.all([
-                CareNavAPI.getVitals(user.id),
-                CareNavAPI.getMedications(user.id),
-                CareNavAPI.getAppointments(user.id),
-                CareNavAPI.getDoctors()
-            ]);
-            if (vitals && Array.isArray(vitals) && vitals.length > 0) {
-                HealthDB.vitals = vitals;
-            }
-            if (meds && Array.isArray(meds) && meds.length > 0) {
-                HealthDB.medications = meds;
-            }
-            if (appts && Array.isArray(appts) && appts.length > 0) {
-                HealthDB.appointments = appts;
-            }
-            if (docs && Array.isArray(docs) && docs.length > 0) {
-                HealthDB.doctors = docs;
-            }
-        } catch (e) {
-            console.warn('Sync with SQLite failed, using cached data:', e);
-        }
-    }
-
-    renderVitals();
-    renderMedications();
-    renderDoctors();
     showScreen('app');
 }
 
@@ -728,6 +947,12 @@ function initNavigation() {
             item.classList.add('active');
             const activePane = document.getElementById(`tab-${targetTab}`);
             if (activePane) activePane.classList.add('active');
+
+            // Trigger tab-specific renders for doctor station
+            if (targetTab === 'doc-dashboard' && typeof renderDoctorStation === 'function') renderDoctorStation();
+            else if (targetTab === 'doc-patients' && typeof renderDoctorPatients === 'function') renderDoctorPatients();
+            else if (targetTab === 'doc-schedule' && typeof renderDoctorSchedule === 'function') renderDoctorSchedule();
+            else if (targetTab === 'doc-prescriptions' && typeof renderDoctorPrescriptions === 'function') renderDoctorPrescriptions();
         });
     });
 }
@@ -1700,14 +1925,927 @@ CREATE TABLE appointments (
     }
 
     // Close on backdrop click
-    [emergencyModal, addVitalModal, addMedModal, bookingModal, settingsModal, databaseModal].forEach(m => {
+    const patientChartModal = document.getElementById('patientChartModal');
+    const telehealthModal = document.getElementById('telehealthModal');
+    [emergencyModal, addVitalModal, addMedModal, bookingModal, settingsModal, databaseModal, patientChartModal, telehealthModal].forEach(m => {
         if (m) {
             m.addEventListener('click', (e) => {
-                if (e.target === m) m.classList.remove('open');
+                if (e.target === m) {
+                    m.classList.remove('open');
+                    if (m === telehealthModal && typeof stopTelehealthTimer === 'function') stopTelehealthTimer();
+                }
             });
         }
     });
 
     // Doctor filter change
     document.getElementById('specialtyFilter').addEventListener('change', renderDoctors);
+}
+
+// ================= MODULE: DOCTOR PROVIDER STATION & CLINICAL CASELOAD =================
+
+let telehealthTimerInterval = null;
+let telehealthSeconds = 272; // default simulated elapsed seconds (04:32)
+let currentChartPatientId = null;
+
+function initDoctorStation() {
+    // 1. Role Switcher Button in Navbar
+    const switchRoleBtn = document.getElementById('switchRoleBtn');
+    if (switchRoleBtn) {
+        switchRoleBtn.addEventListener('click', async () => {
+            const users = JSON.parse(localStorage.getItem('carenav_users') || '[]');
+            if (activeUser && activeUser.role === 'doctor') {
+                // Switch to demo patient
+                let patientUser = users.find(u => u.role === 'patient');
+                if (!patientUser) {
+                    patientUser = {
+                        id: "CN-88492",
+                        name: "Alex Morgan",
+                        email: "alex.morgan@healthmail.com",
+                        role: "patient",
+                        age: 34,
+                        gender: "Male",
+                        bloodGroup: "O Positive (Rh+)",
+                        allergies: ["Penicillin", "Peanuts"],
+                        chronicConditions: ["Mild Asthma", "Pre-diabetes"]
+                    };
+                }
+                showToast("Switching to Patient Portal view...", "info");
+                await loginUser(patientUser, true);
+            } else {
+                // Switch to demo doctor
+                let doctorUser = users.find(u => u.role === 'doctor');
+                if (!doctorUser) {
+                    doctorUser = {
+                        id: "DOC-1029",
+                        name: "Dr. Evelyn Reed, MD",
+                        email: "dr.reed@stjude.org",
+                        role: "doctor",
+                        specialty: "General Physician",
+                        hospital: "St. Jude Memorial Hospital",
+                        license: "MED-499201"
+                    };
+                }
+                showToast("Switching to Doctor / Provider Station...", "info");
+                await loginUser(doctorUser, true);
+            }
+        });
+    }
+
+    // 2. Quick buttons in Doctor Station Banner
+    const docQuickPrescribeBtn = document.getElementById('docQuickPrescribeBtn');
+    if (docQuickPrescribeBtn) {
+        docQuickPrescribeBtn.addEventListener('click', () => {
+            switchToDoctorTab('doc-prescriptions');
+        });
+    }
+
+    const docQuickScheduleBtn = document.getElementById('docQuickScheduleBtn');
+    if (docQuickScheduleBtn) {
+        docQuickScheduleBtn.addEventListener('click', () => {
+            switchToDoctorTab('doc-schedule');
+        });
+    }
+
+    const viewFullScheduleBtn = document.getElementById('viewFullScheduleBtn');
+    if (viewFullScheduleBtn) {
+        viewFullScheduleBtn.addEventListener('click', () => {
+            switchToDoctorTab('doc-schedule');
+        });
+    }
+
+    // 3. Patient Search & Filter buttons
+    const docPatientSearch = document.getElementById('docPatientSearch');
+    if (docPatientSearch) {
+        docPatientSearch.addEventListener('input', (e) => {
+            const query = e.target.value.trim().toLowerCase();
+            const activeFilterBtn = document.querySelector('.filter-patient-btn.active');
+            const filter = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
+            renderDoctorPatients(filter, query);
+        });
+    }
+
+    const patientFilterBtns = document.querySelectorAll('.filter-patient-btn');
+    patientFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            patientFilterBtns.forEach(b => {
+                b.classList.remove('active', 'btn-primary');
+                b.classList.add('btn-outline');
+            });
+            btn.classList.add('active', 'btn-primary');
+            btn.classList.remove('btn-outline');
+            const filter = btn.getAttribute('data-filter');
+            const query = docPatientSearch ? docPatientSearch.value.trim().toLowerCase() : '';
+            renderDoctorPatients(filter, query);
+        });
+    });
+
+    // 4. Consultation Filter Buttons
+    const apptFilterBtns = document.querySelectorAll('.doc-appt-filter');
+    apptFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            apptFilterBtns.forEach(b => {
+                b.classList.remove('active', 'btn-primary');
+                b.classList.add('btn-outline');
+            });
+            btn.classList.add('active', 'btn-primary');
+            btn.classList.remove('btn-outline');
+            const filter = btn.getAttribute('data-filter');
+            renderDoctorSchedule(filter);
+        });
+    });
+
+    // 5. e-Prescribing Form Submission
+    const doctorPrescribeForm = document.getElementById('doctorPrescribeForm');
+    if (doctorPrescribeForm) {
+        doctorPrescribeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const patientId = document.getElementById('rxPatientSelect').value;
+            const medName = document.getElementById('rxMedName').value.trim();
+            const dosage = document.getElementById('rxDosage').value.trim();
+            const purpose = document.getElementById('rxPurpose').value.trim();
+            const refills = document.getElementById('rxRefills').value;
+            const instructions = document.getElementById('rxInstructions').value.trim();
+
+            if (!patientId || !medName || !dosage) {
+                showToast("Please complete all required prescription fields.", "warning");
+                return;
+            }
+
+            const patients = HealthDB.doctorPatients || [];
+            const patient = patients.find(p => p.id === patientId);
+            const patientName = patient ? patient.name : "Patient";
+
+            const newRx = {
+                id: 'rx-' + Date.now(),
+                patient_id: patientId,
+                patient_name: patientName,
+                med_name: medName,
+                dosage: dosage,
+                purpose: purpose,
+                instructions: instructions,
+                refills: refills,
+                date: new Date().toISOString().split('T')[0],
+                status: "Active - Transmitted to Pharmacy"
+            };
+
+            HealthDB.doctorPrescriptions.unshift(newRx);
+            localStorage.setItem('carenav_doctor_prescriptions', JSON.stringify(HealthDB.doctorPrescriptions));
+
+            // Sync with backend API if online
+            if (CareNavAPI.isOnline) {
+                CareNavAPI.addMedication({
+                    patientId: patientId,
+                    name: medName,
+                    frequency: dosage,
+                    purpose: purpose
+                }).catch(err => console.warn('SQLite Rx sync note:', err));
+            }
+
+            renderDoctorPrescriptions();
+            renderDoctorStation();
+            doctorPrescribeForm.reset();
+            showToast(`e-Prescription for ${medName} authorized & transmitted for ${patientName}!`, "success");
+        });
+    }
+
+    // 6. CDSS Presets & Engine Trigger
+    const presetBtns = document.querySelectorAll('.cdss-preset-btn');
+    const caseInput = document.getElementById('cdssCaseInput');
+    presetBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const preset = btn.getAttribute('data-preset');
+            if (preset === 'htn') {
+                caseInput.value = "62-year-old male with persistent headache, systolic BP 142-152 mmHg, mild bilateral pedal edema, history of Type 2 Diabetes and Coronary Artery Disease. Current medications: Atorvastatin 20mg, Metformin. Allergies: Aspirin, Iodine contrast.";
+            } else if (preset === 'asthma') {
+                caseInput.value = "29-year-old female presenting with nocturnal cough and exertional dyspnea. Peak expiratory flow (PEF) 74% of predicted. Using rescue albuterol inhaler >4 times weekly. No fever, clear lung auscultation with mild end-expiratory wheezing bilaterally.";
+            } else if (preset === 'metabolic') {
+                caseInput.value = "34-year-old male presenting for annual cardiometabolic check. BMI 28.6, resting BP 124/82 mmHg, fasting glucose 106 mg/dL, HbA1c 5.8%. Reports mild daytime fatigue and intermittent postprandial somnolence. Strong maternal history of T2D.";
+            }
+        });
+    });
+
+    const runCdssBtn = document.getElementById('runCdssBtn');
+    if (runCdssBtn) {
+        runCdssBtn.addEventListener('click', runCdssAnalysis);
+    }
+
+    // 7. Modals: Patient Chart & Telehealth
+    const closeChartModal = document.getElementById('closePatientChartModal');
+    const patientChartModal = document.getElementById('patientChartModal');
+    if (closeChartModal && patientChartModal) {
+        closeChartModal.addEventListener('click', () => patientChartModal.classList.remove('open'));
+    }
+
+    const chartPrintBtn = document.getElementById('chartPrintBtn');
+    if (chartPrintBtn) {
+        chartPrintBtn.addEventListener('click', () => {
+            window.print();
+        });
+    }
+
+    const chartPrescribeBtn = document.getElementById('chartPrescribeBtn');
+    if (chartPrescribeBtn) {
+        chartPrescribeBtn.addEventListener('click', () => {
+            if (patientChartModal) patientChartModal.classList.remove('open');
+            switchToDoctorTab('doc-prescriptions');
+            if (currentChartPatientId) {
+                const rxSelect = document.getElementById('rxPatientSelect');
+                if (rxSelect) rxSelect.value = currentChartPatientId;
+            }
+        });
+    }
+
+    const closeTeleModal = document.getElementById('closeTelehealthModal');
+    const telehealthModal = document.getElementById('telehealthModal');
+    if (closeTeleModal && telehealthModal) {
+        closeTeleModal.addEventListener('click', () => {
+            telehealthModal.classList.remove('open');
+            stopTelehealthTimer();
+        });
+    }
+
+    const endTelehealthCallBtn = document.getElementById('endTelehealthCallBtn');
+    if (endTelehealthCallBtn) {
+        endTelehealthCallBtn.addEventListener('click', () => {
+            if (telehealthModal) telehealthModal.classList.remove('open');
+            stopTelehealthTimer();
+            showToast("Telehealth encounter ended. Clinical SOAP note archived to EHR.", "info");
+        });
+    }
+
+    const saveSoapNoteBtn = document.getElementById('saveSoapNoteBtn');
+    if (saveSoapNoteBtn) {
+        saveSoapNoteBtn.addEventListener('click', () => {
+            const noteVal = document.getElementById('telehealthSoapNotes').value.trim();
+            if (!noteVal) {
+                showToast("Please enter clinical notes before signing.", "warning");
+                return;
+            }
+            showToast("SOAP encounter note electronically signed and stored to chart.", "success");
+        });
+    }
+
+    const toggleMicBtn = document.getElementById('toggleMicBtn');
+    if (toggleMicBtn) {
+        toggleMicBtn.addEventListener('click', () => {
+            const isMuted = toggleMicBtn.classList.toggle('active');
+            toggleMicBtn.style.background = isMuted ? 'var(--danger)' : '#334155';
+            showToast(isMuted ? "Microphone muted" : "Microphone active", "info");
+        });
+    }
+
+    const toggleVideoBtn = document.getElementById('toggleVideoBtn');
+    if (toggleVideoBtn) {
+        toggleVideoBtn.addEventListener('click', () => {
+            const isPaused = toggleVideoBtn.classList.toggle('active');
+            toggleVideoBtn.style.background = isPaused ? 'var(--danger)' : '#334155';
+            showToast(isPaused ? "Video feed stopped" : "Video feed restored", "info");
+        });
+    }
+
+    const toggleShareBtn = document.getElementById('toggleShareBtn');
+    if (toggleShareBtn) {
+        toggleShareBtn.addEventListener('click', () => {
+            showToast("Patient medical chart shared to virtual screen presentation.", "info");
+        });
+    }
+}
+
+function switchToDoctorTab(tabId) {
+    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+    const navItem = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+    if (navItem) navItem.classList.add('active');
+
+    const pane = document.getElementById(`tab-${tabId}`);
+    if (pane) pane.classList.add('active');
+
+    if (tabId === 'doc-dashboard') renderDoctorStation();
+    else if (tabId === 'doc-patients') renderDoctorPatients();
+    else if (tabId === 'doc-schedule') renderDoctorSchedule();
+    else if (tabId === 'doc-prescriptions') renderDoctorPrescriptions();
+}
+
+// 8. Render Doctor Command Center (KPIs, Queue, Alerts)
+async function renderDoctorStation() {
+    let patients = HealthDB.doctorPatients || [];
+    let appts = HealthDB.doctorAppointments || [];
+    let prescriptions = HealthDB.doctorPrescriptions || [];
+
+    // Sync from SQLite if online
+    if (CareNavAPI.isOnline) {
+        try {
+            const [apiPatients, apiAppts] = await Promise.all([
+                CareNavAPI.getAllPatients(),
+                CareNavAPI.getDoctorAppointments('DOC-1029')
+            ]);
+            if (apiPatients && Array.isArray(apiPatients) && apiPatients.length > 0) {
+                patients = apiPatients;
+                HealthDB.doctorPatients = apiPatients;
+            }
+            if (apiAppts && Array.isArray(apiAppts) && apiAppts.length > 0) {
+                appts = apiAppts;
+                HealthDB.doctorAppointments = apiAppts;
+            }
+        } catch (e) {
+            console.warn('SQLite doctor sync note:', e);
+        }
+    }
+
+    // Update KPI numbers
+    const kpiCaseload = document.getElementById('docKpiCaseload');
+    const kpiConsults = document.getElementById('docKpiConsults');
+    const kpiAlerts = document.getElementById('docKpiAlerts');
+    const kpiMeds = document.getElementById('docKpiMeds');
+    const miniDocPatientsCount = document.getElementById('miniDocPatientsCount');
+
+    if (kpiCaseload) kpiCaseload.textContent = patients.length;
+    if (kpiConsults) kpiConsults.textContent = appts.filter(a => a.status !== 'Cancelled').length;
+    const criticalPatients = patients.filter(p => p.latest_vitals && (p.latest_vitals.status === 'Elevated' || p.latest_vitals.status === 'Critical' || p.latest_vitals.status === 'High'));
+    if (kpiAlerts) kpiAlerts.textContent = criticalPatients.length;
+    if (kpiMeds) kpiMeds.textContent = prescriptions.length;
+    if (miniDocPatientsCount) miniDocPatientsCount.textContent = `${patients.length} Patients`;
+
+    // Render Today's Schedule Queue in dashboard
+    const schedContainer = document.getElementById('docDashboardScheduleList');
+    if (schedContainer) {
+        if (appts.length === 0) {
+            schedContainer.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-muted);">No consultation visits scheduled for today.</div>`;
+        } else {
+            schedContainer.innerHTML = appts.map(a => {
+                const patient = patients.find(p => p.id === a.patient_id);
+                const pName = a.patient_name || (patient ? patient.name : 'Alex Morgan');
+                const isTele = (a.type && a.type.includes('Telehealth')) || a.notes.toLowerCase().includes('telehealth') || a.id === 'apt-101';
+                return `
+                    <div class="consultation-card" style="margin-bottom: 0; padding: 14px 16px;">
+                        <div class="consult-patient-meta">
+                            <div class="consult-avatar" style="width: 38px; height: 38px; font-size: 1rem;">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                            <div class="consult-info">
+                                <h4 style="font-size: 0.92rem;">${pName}</h4>
+                                <p style="font-size: 0.78rem;">
+                                    <i class="fa-solid fa-clock" style="color: var(--primary);"></i> ${a.time_slot || '10:00 AM'} &bull;
+                                    <span style="color: ${isTele ? 'var(--teal)' : 'var(--primary)'}; font-weight: 600;">
+                                        ${isTele ? 'Virtual Telehealth' : 'In-Clinic'}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="consult-actions">
+                            <button class="btn btn-outline btn-sm" onclick="openPatientChartModal('${a.patient_id || 'CN-88492'}')" title="Open EHR Chart">
+                                <i class="fa-solid fa-file-waveform"></i> Chart
+                            </button>
+                            ${isTele ? `
+                                <button class="btn btn-primary btn-sm" onclick="openTelehealthModal('${a.patient_id || 'CN-88492'}', '${a.id}')" style="background: var(--teal); border-color: var(--teal);">
+                                    <i class="fa-solid fa-video"></i> Launch
+                                </button>
+                            ` : `
+                                <button class="btn btn-primary btn-sm" onclick="markAppointmentDone('${a.id}')">
+                                    <i class="fa-solid fa-check"></i> Complete
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+    }
+
+    // Render Priority Alerts in dashboard
+    const alertsContainer = document.getElementById('docDashboardAlertsList');
+    if (alertsContainer) {
+        alertsContainer.innerHTML = `
+            <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--radius-md); padding: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="status-pill status-critical" style="font-size: 0.72rem;"><i class="fa-solid fa-triangle-exclamation"></i> Stage 1 HTN Alert</span>
+                        <strong style="font-size: 0.92rem; color: #9f1239;">Marcus Bell (62 M)</strong>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #881337; margin-top: 4px;">
+                        BP: <strong>142/92 mmHg</strong> &bull; HR: 88 bpm &bull; SpO2: 96%. Recommended action: Review ACEi / ARB titration.
+                    </p>
+                </div>
+                <button class="btn btn-sm" onclick="openPatientChartModal('CN-51204')" style="background: #e11d48; color: #ffffff; flex-shrink: 0;">
+                    Review Chart
+                </button>
+            </div>
+
+            <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: var(--radius-md); padding: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="status-pill status-elevated" style="font-size: 0.72rem;"><i class="fa-solid fa-clock"></i> Routine Follow-up</span>
+                        <strong style="font-size: 0.92rem; color: #92400e;">Sarah Jenkins (48 F)</strong>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #78350f; margin-top: 4px;">
+                        BP: <strong>128/84 mmHg</strong> &bull; Stable. Scheduled today at 11:30 AM for hypertension check.
+                    </p>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="openPatientChartModal('CN-73910')" style="color: #b45309; border-color: #f59e0b; flex-shrink: 0;">
+                    Examine
+                </button>
+            </div>
+
+            <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="status-pill status-stable" style="font-size: 0.72rem;"><i class="fa-solid fa-circle-check"></i> Vitals Controlled</span>
+                        <strong style="font-size: 0.92rem; color: #166534;">Alex Morgan (34 M)</strong>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #14532d; margin-top: 4px;">
+                        BP: <strong>120/80 mmHg</strong> &bull; SpO2: 99% &bull; Glucose: 96 mg/dL. Pre-diabetes HbA1c review pending.
+                    </p>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="openPatientChartModal('CN-88492')" style="color: #15803d; border-color: #22c55e; flex-shrink: 0;">
+                    View Chart
+                </button>
+            </div>
+        `;
+    }
+}
+
+// 9. Render Patient Caseload Table
+function renderDoctorPatients(filter = 'all', searchQuery = '') {
+    const tbody = document.getElementById('doctorPatientsTableBody');
+    if (!tbody) return;
+
+    let patients = HealthDB.doctorPatients || [];
+
+    // Filter by risk
+    if (filter === 'critical') {
+        patients = patients.filter(p => p.latest_vitals && (p.latest_vitals.status === 'Elevated' || p.latest_vitals.status === 'Critical' || p.latest_vitals.status === 'High'));
+    } else if (filter === 'stable') {
+        patients = patients.filter(p => !p.latest_vitals || (p.latest_vitals.status !== 'Elevated' && p.latest_vitals.status !== 'Critical' && p.latest_vitals.status !== 'High'));
+    }
+
+    // Filter by search query
+    if (searchQuery) {
+        patients = patients.filter(p =>
+            p.name.toLowerCase().includes(searchQuery) ||
+            p.id.toLowerCase().includes(searchQuery) ||
+            (p.chronicConditions && p.chronicConditions.some(c => c.toLowerCase().includes(searchQuery)))
+        );
+    }
+
+    if (patients.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">No patients match the selected filter.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = patients.map(p => {
+        const v = p.latest_vitals || { bp: "120/80", hr: 74, spo2: 99, status: "Normal" };
+        const isCritical = v.status === 'Elevated' || v.status === 'Critical' || v.status === 'High';
+        const statusClass = isCritical ? 'status-critical' : 'status-stable';
+        const conditionsHtml = (p.chronicConditions || ['None recorded']).map(c =>
+            `<span style="display: inline-block; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; margin: 1px;">${c}</span>`
+        ).join(' ');
+
+        return `
+            <tr>
+                <td>
+                    <strong style="color: var(--text-primary); font-size: 0.92rem;">${p.name}</strong><br>
+                    <small style="color: var(--text-muted); font-family: monospace;">${p.id}</small>
+                </td>
+                <td>
+                    ${p.age} y/o &bull; ${p.gender}<br>
+                    <small style="color: var(--text-secondary);">Blood: <strong>${p.bloodGroup || 'O+'}</strong></small>
+                </td>
+                <td style="max-width: 220px;">
+                    ${conditionsHtml}
+                </td>
+                <td>
+                    <strong>${v.bp}</strong> mmHg<br>
+                    <small style="color: var(--text-secondary);">HR: ${v.hr} bpm &bull; SpO2: ${v.spo2}%</small>
+                </td>
+                <td>
+                    <span class="badge badge-info" style="font-size: 0.75rem;">${p.medications_count || 2} Active Rx</span>
+                </td>
+                <td>
+                    <span class="status-pill ${statusClass}">
+                        <i class="fa-solid ${isCritical ? 'fa-triangle-exclamation' : 'fa-circle-check'}"></i>
+                        ${isCritical ? 'Flagged Vitals' : 'Stable'}
+                    </span>
+                </td>
+                <td>
+                    <div style="display: flex; gap: 6px;">
+                        <button class="btn btn-outline btn-sm" onclick="openPatientChartModal('${p.id}')" title="Inspect Medical Chart">
+                            <i class="fa-solid fa-file-waveform"></i> Chart
+                        </button>
+                        <button class="btn btn-primary btn-sm" onclick="quickPrescribeForPatient('${p.id}')" title="Author e-Prescription" style="background: #9333ea; border-color: #9333ea;">
+                            <i class="fa-solid fa-prescription"></i> e-Rx
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// 10. Render Consultations & Telehealth Schedule
+function renderDoctorSchedule(filter = 'all') {
+    const container = document.getElementById('doctorConsultationsContainer');
+    if (!container) return;
+
+    let appts = HealthDB.doctorAppointments || [];
+    const patients = HealthDB.doctorPatients || [];
+
+    if (filter === 'confirmed') {
+        appts = appts.filter(a => a.status === 'Confirmed');
+    } else if (filter === 'completed') {
+        appts = appts.filter(a => a.status === 'Completed');
+    }
+
+    if (appts.length === 0) {
+        container.innerHTML = `<div style="padding: 32px; text-align: center; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border-color);">No appointments found under this filter.</div>`;
+        return;
+    }
+
+    container.innerHTML = appts.map(apt => {
+        const patient = patients.find(p => p.id === apt.patient_id);
+        const pName = apt.patient_name || (patient ? patient.name : 'Alex Morgan');
+        const isTele = (apt.type && apt.type.includes('Telehealth')) || apt.notes.toLowerCase().includes('telehealth') || apt.id === 'apt-101' || apt.id === 'apt-103';
+        const isCompleted = apt.status === 'Completed';
+
+        return `
+            <div class="consultation-card" style="opacity: ${isCompleted ? 0.75 : 1};">
+                <div class="consult-patient-meta">
+                    <div class="consult-avatar" style="${isTele ? 'background: rgba(13, 148, 136, 0.12); color: var(--teal);' : ''}">
+                        <i class="fa-solid ${isTele ? 'fa-video' : 'fa-hospital-user'}"></i>
+                    </div>
+                    <div class="consult-info">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h4>${pName}</h4>
+                            <span class="status-pill ${isTele ? 'status-stable' : ''}" style="font-size: 0.7rem;">
+                                ${isTele ? '<i class=\"fa-solid fa-video\"></i> Virtual Telehealth' : '<i class=\"fa-solid fa-building\"></i> In-Clinic Visit'}
+                            </span>
+                            <span class="badge ${isCompleted ? 'badge-success' : 'badge-info'}" style="font-size: 0.72rem;">${apt.status}</span>
+                        </div>
+                        <p style="margin-top: 4px;">
+                            <strong>Date:</strong> ${apt.appointment_date} at <strong>${apt.time_slot}</strong> &bull;
+                            <strong>Reason:</strong> ${apt.notes}
+                        </p>
+                    </div>
+                </div>
+                <div class="consult-actions">
+                    <button class="btn btn-outline btn-sm" onclick="openPatientChartModal('${apt.patient_id || 'CN-88492'}')">
+                        <i class="fa-solid fa-notes-medical"></i> View Chart
+                    </button>
+                    ${!isCompleted ? `
+                        ${isTele ? `
+                            <button class="btn btn-primary btn-sm" onclick="openTelehealthModal('${apt.patient_id || 'CN-88492'}', '${apt.id}')" style="background: var(--teal); border-color: var(--teal);">
+                                <i class="fa-solid fa-video"></i> Start Telehealth Call
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-outline btn-sm" onclick="markAppointmentDone('${apt.id}')" style="color: var(--teal); border-color: var(--teal);">
+                            <i class="fa-solid fa-check"></i> Mark Done
+                        </button>
+                    ` : `
+                        <span style="font-size: 0.8rem; color: var(--teal); font-weight: 600;"><i class="fa-solid fa-circle-check"></i> Encounter Archived</span>
+                    `}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// 11. Render Issued Outpatient Prescriptions
+function renderDoctorPrescriptions() {
+    const container = document.getElementById('doctorIssuedRxList');
+    const badge = document.getElementById('docRxCountBadge');
+    if (!container) return;
+
+    const list = HealthDB.doctorPrescriptions || [];
+    if (badge) badge.textContent = `${list.length} Active Rx`;
+
+    if (list.length === 0) {
+        container.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-muted);">No active prescriptions issued yet. Authorize one on the left.</div>`;
+        return;
+    }
+
+    container.innerHTML = list.map(rx => `
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <strong style="color: var(--text-primary); font-size: 0.95rem;">${rx.med_name}</strong>
+                    <span class="status-pill status-stable" style="font-size: 0.7rem;">Active e-Rx</span>
+                </div>
+                <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 4px;">
+                    <strong>Patient:</strong> ${rx.patient_name || 'Alex Morgan'} &bull;
+                    <strong>Dosage:</strong> ${rx.dosage}
+                </div>
+                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                    Indication: ${rx.purpose} &bull; Authorized: ${rx.date || '2026-09-01'}
+                </div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="discontinueRx('${rx.id}')" style="color: var(--danger); border-color: var(--danger); flex-shrink: 0;" title="Discontinue Prescription">
+                <i class="fa-solid fa-ban"></i> Discontinue
+            </button>
+        </div>
+    `).join('');
+}
+
+function quickPrescribeForPatient(patientId) {
+    switchToDoctorTab('doc-prescriptions');
+    const rxSelect = document.getElementById('rxPatientSelect');
+    if (rxSelect) rxSelect.value = patientId;
+}
+
+function markAppointmentDone(apptId) {
+    const appts = HealthDB.doctorAppointments || [];
+    const appt = appts.find(a => a.id === apptId);
+    if (appt) {
+        appt.status = 'Completed';
+        localStorage.setItem('carenav_doctor_appts', JSON.stringify(appts));
+        if (CareNavAPI.isOnline) {
+            CareNavAPI.updateAppointmentStatus(apptId, 'Completed').catch(e => console.warn(e));
+        }
+        renderDoctorSchedule();
+        renderDoctorStation();
+        showToast("Appointment visit completed and encounter archived.", "success");
+    }
+}
+
+function discontinueRx(rxId) {
+    HealthDB.doctorPrescriptions = HealthDB.doctorPrescriptions.filter(r => r.id !== rxId);
+    localStorage.setItem('carenav_doctor_prescriptions', JSON.stringify(HealthDB.doctorPrescriptions));
+    renderDoctorPrescriptions();
+    renderDoctorStation();
+    showToast("Prescription marked as discontinued.", "info");
+}
+
+// 12. Open EHR Patient Chart Inspector Modal
+function openPatientChartModal(patientId) {
+    currentChartPatientId = patientId;
+    const modal = document.getElementById('patientChartModal');
+    const body = document.getElementById('patientChartBody');
+    const title = document.getElementById('chartModalPatientName');
+    const meta = document.getElementById('chartModalPatientMeta');
+    if (!modal || !body) return;
+
+    const patients = HealthDB.doctorPatients || [];
+    const p = patients.find(pt => pt.id === patientId) || {
+        id: patientId,
+        name: "Alex Morgan",
+        age: 34,
+        gender: "Male",
+        bloodGroup: "O Positive (Rh+)",
+        allergies: ["Penicillin", "Peanuts"],
+        chronicConditions: ["Mild Asthma", "Pre-diabetes"],
+        emergencyContact: "Sarah Morgan (Spouse) - +1 (555) 019-2834"
+    };
+
+    if (title) title.textContent = `${p.name} — Medical Record Chart`;
+    if (meta) meta.textContent = `ID: ${p.id} • ${p.age} y/o • ${p.gender} • Blood Group: ${p.bloodGroup}`;
+
+    const allergiesHtml = (p.allergies || ['None']).map(a =>
+        `<span style="background: #fee2e2; color: #dc2626; padding: 3px 8px; border-radius: 12px; font-weight: 600; font-size: 0.75rem; margin-right: 4px;"><i class="fa-solid fa-triangle-exclamation"></i> ${a}</span>`
+    ).join('');
+
+    const conditionsHtml = (p.chronicConditions || ['None']).map(c =>
+        `<span style="background: #e0f2fe; color: #0284c7; padding: 3px 8px; border-radius: 12px; font-weight: 600; font-size: 0.75rem; margin-right: 4px;">${c}</span>`
+    ).join('');
+
+    // Recent vitals
+    const vitals = (p.id === 'CN-88492' ? HealthDB.vitals : [
+        { date: "2026-09-08 09:15 AM", bp: p.latest_vitals ? p.latest_vitals.bp : "120/80", hr: p.latest_vitals ? p.latest_vitals.hr : 74, glucose: p.latest_vitals ? p.latest_vitals.glucose : 96, spo2: p.latest_vitals ? p.latest_vitals.spo2 : 99, status: p.latest_vitals ? p.latest_vitals.status : "Normal" }
+    ]);
+
+    body.innerHTML = `
+        <!-- Patient Summary Card -->
+        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; font-size: 0.85rem;">
+                <div><span style="color: var(--text-muted);">Legal Name:</span> <strong>${p.name}</strong></div>
+                <div><span style="color: var(--text-muted);">Medical ID:</span> <code>${p.id}</code></div>
+                <div><span style="color: var(--text-muted);">Age / Gender:</span> <strong>${p.age} y/o &bull; ${p.gender}</strong></div>
+                <div><span style="color: var(--text-muted);">Blood Type:</span> <strong>${p.bloodGroup}</strong></div>
+                <div><span style="color: var(--text-muted);">Emergency Contact:</span> <strong>${p.emergencyContact || 'On file'}</strong></div>
+                <div><span style="color: var(--text-muted);">Primary Facility:</span> <strong>St. Jude Memorial Hospital</strong></div>
+            </div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 8px;">
+                <div><strong style="color: var(--danger); font-size: 0.82rem;">DOCUMENTED ALLERGIES:</strong> ${allergiesHtml}</div>
+                <div><strong style="color: var(--primary); font-size: 0.82rem;">CHRONIC DIAGNOSES:</strong> ${conditionsHtml}</div>
+            </div>
+        </div>
+
+        <!-- Biometric Telemetry History -->
+        <div style="margin-bottom: 20px;">
+            <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-heart-pulse" style="color: var(--danger);"></i> Biometric Vitals History & Trend
+            </h4>
+            <div class="doctor-table-wrapper">
+                <table class="doctor-table">
+                    <thead>
+                        <tr>
+                            <th>Date / Time</th>
+                            <th>Blood Pressure</th>
+                            <th>Heart Rate</th>
+                            <th>Glucose</th>
+                            <th>SpO2</th>
+                            <th>Assessment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${vitals.map(v => `
+                            <tr>
+                                <td>${v.date}</td>
+                                <td><strong>${v.bp}</strong> mmHg</td>
+                                <td>${v.hr} bpm</td>
+                                <td>${v.glucose} mg/dL</td>
+                                <td>${v.spo2}%</td>
+                                <td>
+                                    <span class="status-pill ${v.status === 'Normal' ? 'status-stable' : 'status-critical'}">
+                                        ${v.status}
+                                    </span>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Active Medications -->
+        <div>
+            <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-prescription-bottle-medical" style="color: #9333ea;"></i> Active Formularies Overseen
+            </h4>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                ${(HealthDB.doctorPrescriptions.filter(r => r.patient_id === p.id).length > 0 ?
+                    HealthDB.doctorPrescriptions.filter(r => r.patient_id === p.id).map(r => `
+                        <div style="padding: 10px 14px; background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong>${r.med_name}</strong> &bull; <small style="color: var(--text-secondary);">${r.dosage}</small>
+                                <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">Indication: ${r.purpose}</div>
+                            </div>
+                            <span class="status-pill status-stable" style="font-size: 0.7rem;">Active</span>
+                        </div>
+                    `).join('')
+                    : `<div style="padding: 12px; color: var(--text-muted); font-size: 0.85rem;">No active medications prescribed specifically for this patient. Click 'Prescribe Medication' below to author.</div>`
+                )}
+            </div>
+        </div>
+    `;
+
+    modal.classList.add('open');
+}
+
+// 13. Open Virtual Telehealth Encounter Modal
+function openTelehealthModal(patientId, appointmentId) {
+    const modal = document.getElementById('telehealthModal');
+    if (!modal) return;
+
+    const patients = HealthDB.doctorPatients || [];
+    const p = patients.find(pt => pt.id === patientId) || {
+        name: "Alex Morgan",
+        latest_vitals: { bp: "120/80", hr: 74, spo2: 99, glucose: 96 }
+    };
+
+    const nameEl = document.getElementById('telehealthPatientName');
+    const bpEl = document.getElementById('telehealthBp');
+    const hrEl = document.getElementById('telehealthHr');
+    const spo2El = document.getElementById('telehealthSpo2');
+    const glEl = document.getElementById('telehealthGl');
+
+    if (nameEl) nameEl.textContent = p.name;
+    const v = p.latest_vitals || { bp: "120/80", hr: 74, spo2: 99, glucose: 96 };
+    if (bpEl) bpEl.textContent = `${v.bp} mmHg`;
+    if (hrEl) hrEl.textContent = `${v.hr} bpm`;
+    if (spo2El) spo2El.textContent = `${v.spo2}%`;
+    if (glEl) glEl.textContent = `${v.glucose || 96} mg/dL`;
+
+    // Pre-fill SOAP note
+    const soapNotes = document.getElementById('telehealthSoapNotes');
+    if (soapNotes) {
+        soapNotes.value = `SUBJECTIVE (S):\nPatient presents for scheduled virtual telehealth consultation. Denies acute chest pain, shortness of breath, or adverse reactions.\n\nOBJECTIVE (O):\nBiometrics: BP ${v.bp} mmHg, HR ${v.hr} bpm, SpO2 ${v.spo2}%, Fasting Glucose ${v.glucose || 96} mg/dL. General appearance: alert, conversational.\n\nASSESSMENT (A):\n1. Chronic outpatient status stable.\n2. Adherence to prescribed pharmacotherapy verified.\n\nPLAN (P):\n1. Continue current regimen without modification.\n2. Scheduled routine interval review in 90 days.`;
+    }
+
+    startTelehealthTimer();
+    modal.classList.add('open');
+}
+
+function startTelehealthTimer() {
+    stopTelehealthTimer();
+    telehealthSeconds = 272; // start at 04:32 for realism
+    const timerEl = document.getElementById('telehealthTimer');
+    telehealthTimerInterval = setInterval(() => {
+        telehealthSeconds++;
+        const mins = Math.floor(telehealthSeconds / 60).toString().padStart(2, '0');
+        const secs = (telehealthSeconds % 60).toString().padStart(2, '0');
+        if (timerEl) timerEl.textContent = `${mins}:${secs}`;
+    }, 1000);
+}
+
+function stopTelehealthTimer() {
+    if (telehealthTimerInterval) {
+        clearInterval(telehealthTimerInterval);
+        telehealthTimerInterval = null;
+    }
+}
+
+// 14. CDSS Differential Diagnosis AI Copilot
+function runCdssAnalysis() {
+    const input = document.getElementById('cdssCaseInput').value.trim();
+    const output = document.getElementById('cdssOutputArea');
+    const statusBadge = document.getElementById('cdssStatusBadge');
+    if (!input) {
+        showToast("Please enter or select a clinical case presentation to analyze.", "warning");
+        return;
+    }
+
+    if (statusBadge) {
+        statusBadge.className = 'status-pill status-elevated';
+        statusBadge.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing GDMT Guidelines...';
+    }
+
+    setTimeout(() => {
+        if (statusBadge) {
+            statusBadge.className = 'status-pill status-stable';
+            statusBadge.innerHTML = '<i class="fa-solid fa-circle-check"></i> Analysis Complete';
+        }
+
+        const lower = input.toLowerCase();
+        let primaryDx = "Stage 1 Essential Hypertension (ICD-10 I10)";
+        let primaryPct = "86%";
+        let secDx = "Secondary Hypertension (Renovascular / Hyperaldosteronism)";
+        let secPct = "24%";
+        let redFlag = "Monitor for hypertensive urgency (BP > 180/120) or acute end-organ damage symptoms (headache, visual changes, chest tightness).";
+        let guideline = "ACC/AHA 2024 Guidelines: Initiate first-line therapy with ACE inhibitor (Lisinopril 10mg) or ARB (Losartan 50mg). Target BP < 130/80 mmHg. Recommend dietary sodium restriction < 2,000 mg/day.";
+        let labWorkup = ["Comprehensive Metabolic Panel (CMP)", "Serum Creatinine & eGFR", "Spot Urine Albumin-to-Creatinine Ratio (uACR)", "12-Lead Resting Electrocardiogram (ECG)", "Fasting Lipid Panel"];
+
+        if (lower.includes('cough') || lower.includes('wheezing') || lower.includes('asthma') || lower.includes('pef')) {
+            primaryDx = "Moderate Persistent Asthma with Bronchospasm (ICD-10 J45.40)";
+            primaryPct = "91%";
+            secDx = "Cough-Variant Asthma vs. Post-Infectious Airway Hyperreactivity";
+            secPct = "28%";
+            redFlag = "Assess for acute severe exacerbation (silent chest, PEF < 50%, accessory muscle use). Escalate immediately if refractory to SABA.";
+            guideline = "GINA 2024 Guidelines: Step 3 therapy indicated. Initiate low-dose ICS-formoterol maintenance and reliever therapy (SMART). Avoid SABA-only monotherapy.";
+            labWorkup = ["Pre- and Post-Bronchodilator Spirometry", "Fractional Exhaled Nitric Oxide (FeNO)", "Complete Blood Count (CBC with differential for eosinophils)", "Chest Radiograph (PA/Lateral)"];
+        } else if (lower.includes('glucose') || lower.includes('hba1c') || lower.includes('metabolic') || lower.includes('t2d')) {
+            primaryDx = "Metabolic Syndrome & Impaired Fasting Glucose / Pre-diabetes (ICD-10 R73.03)";
+            primaryPct = "89%";
+            secDx = "Early Type 2 Diabetes Mellitus with Insulin Resistance";
+            secPct = "32%";
+            redFlag = "Screen for microvascular complications (retinopathy, microalbuminuria, distal symmetrical polyneuropathy).";
+            guideline = "ADA Standards of Care 2024: Target HbA1c < 7.0%. Initiate Metformin 500mg titration along with structured lifestyle intervention (150 min/week moderate aerobic exercise). Consider GLP-1 RA or SGLT2i if established ASCVD.";
+            labWorkup = ["Repeat HbA1c in 3 months", "Comprehensive Lipid Profile (LDL-C target < 70 mg/dL)", "Urine Microalbumin / Creatinine Ratio", "Estimated Glomerular Filtration Rate (eGFR)", "Serum ALT/AST for hepatic steatosis screening"];
+        }
+
+        output.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                <!-- Differential Diagnosis Probabilities -->
+                <div>
+                    <h4 style="font-size: 0.88rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Differential Diagnostic Considerations</h4>
+                    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 0.9rem; color: var(--text-primary); margin-bottom: 6px;">
+                            <span>1. ${primaryDx}</span>
+                            <span style="color: var(--teal);">${primaryPct} Probability</span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                            <div style="width: ${primaryPct}; height: 100%; background: var(--teal);"></div>
+                        </div>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px;">
+                        <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 6px;">
+                            <span>2. ${secDx}</span>
+                            <span style="color: var(--primary);">${secPct} Probability</span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                            <div style="width: ${secPct}; height: 100%; background: var(--primary);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contraindication / Safety Alert -->
+                <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: var(--radius-sm); padding: 12px 14px;">
+                    <strong style="color: #be123c; font-size: 0.82rem; display: block; margin-bottom: 4px;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Clinical Contraindication & Red Flags:
+                    </strong>
+                    <p style="font-size: 0.8rem; color: #881337; line-height: 1.4;">${redFlag}</p>
+                </div>
+
+                <!-- Guideline Recommendation (GDMT) -->
+                <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-sm); padding: 12px 14px;">
+                    <strong style="color: #15803d; font-size: 0.82rem; display: block; margin-bottom: 4px;">
+                        <i class="fa-solid fa-book-medical"></i> Guideline-Directed Medical Therapy (GDMT):
+                    </strong>
+                    <p style="font-size: 0.8rem; color: #14532d; line-height: 1.4;">${guideline}</p>
+                </div>
+
+                <!-- Recommended Diagnostic Workup -->
+                <div>
+                    <h4 style="font-size: 0.88rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 8px;">Recommended Diagnostic Workup Orders</h4>
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px;">
+                        ${labWorkup.map(item => `
+                            <li style="font-size: 0.82rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                                <i class="fa-solid fa-circle-check" style="color: var(--teal); font-size: 0.8rem;"></i> ${item}
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            </div>
+        `;
+    }, 450);
 }

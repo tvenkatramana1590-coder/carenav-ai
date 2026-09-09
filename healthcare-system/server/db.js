@@ -265,7 +265,22 @@ function seedDatabase(db) {
         insertMed.run(m.id, m.patient_id || "CN-88492", m.name, m.frequency, m.purpose);
     }
 
-    console.log('Database seeded successfully with initial patients, doctors, vitals, and medications!');
+    // Seed initial appointments
+    const appointments = (seedData && seedData.appointments) ? seedData.appointments : [
+        { id: "apt-101", patient_id: "CN-88492", doctor_id: "DOC-1029", doctor_name: "Dr. Evelyn Reed, MD", specialty: "General Physician", appointment_date: "2026-09-15", time_slot: "10:00 AM", notes: "Follow-up HbA1c review & asthma assessment", status: "Confirmed" },
+        { id: "apt-102", patient_id: "CN-73910", doctor_id: "DOC-1029", doctor_name: "Dr. Evelyn Reed, MD", specialty: "General Physician", appointment_date: "2026-09-15", time_slot: "11:30 AM", notes: "Hypertension blood pressure check and medication titration", status: "Confirmed" },
+        { id: "apt-103", patient_id: "CN-51204", doctor_id: "DOC-1029", doctor_name: "Dr. Evelyn Reed, MD", specialty: "General Physician", appointment_date: "2026-09-16", time_slot: "02:00 PM", notes: "Cardiometabolic risk evaluation and lipid panel discussion", status: "Confirmed" }
+    ];
+
+    const insertAppt = db.prepare(`
+        INSERT INTO appointments (id, patient_id, doctor_id, doctor_name, specialty, appointment_date, time_slot, notes, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    for (const a of appointments) {
+        insertAppt.run(a.id, a.patient_id, a.doctor_id, a.doctor_name, a.specialty, a.appointment_date, a.time_slot, a.notes, a.status || 'Confirmed');
+    }
+
+    console.log('Database seeded successfully with initial patients, doctors, vitals, medications, and appointments!');
 }
 
 module.exports = {

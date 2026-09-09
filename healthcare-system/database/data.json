@@ -9,9 +9,55 @@
       "age": 34,
       "gender": "Male",
       "bloodGroup": "O Positive (Rh+)",
-      "allergies": ["Penicillin", "Peanuts"],
-      "chronicConditions": ["Mild Asthma", "Pre-diabetes"],
+      "allergies": [
+        "Penicillin",
+        "Peanuts"
+      ],
+      "chronicConditions": [
+        "Mild Asthma",
+        "Pre-diabetes"
+      ],
       "emergencyContact": "Sarah Morgan (Spouse) - +1 (555) 019-2834",
+      "primaryCarePhysician": "Dr. Evelyn Reed (St. Jude Hospital)"
+    },
+    {
+      "id": "CN-73910",
+      "name": "Sarah Jenkins",
+      "email": "sarah.jenkins@healthmail.com",
+      "password": "password123",
+      "role": "patient",
+      "age": 48,
+      "gender": "Female",
+      "bloodGroup": "A Positive (Rh+)",
+      "allergies": [
+        "Sulfa Drugs",
+        "Codeine"
+      ],
+      "chronicConditions": [
+        "Hypertension",
+        "Dyslipidemia"
+      ],
+      "emergencyContact": "Robert Jenkins (Spouse) - +1 (555) 018-9123",
+      "primaryCarePhysician": "Dr. Evelyn Reed (St. Jude Hospital)"
+    },
+    {
+      "id": "CN-51204",
+      "name": "Marcus Bell",
+      "email": "marcus.bell@healthmail.com",
+      "password": "password123",
+      "role": "patient",
+      "age": 62,
+      "gender": "Male",
+      "bloodGroup": "B Positive (Rh+)",
+      "allergies": [
+        "Aspirin",
+        "Iodine Contrast"
+      ],
+      "chronicConditions": [
+        "Type 2 Diabetes",
+        "Coronary Artery Disease"
+      ],
+      "emergencyContact": "David Bell (Son) - +1 (555) 012-4491",
       "primaryCarePhysician": "Dr. Evelyn Reed (St. Jude Hospital)"
     },
     {
@@ -54,13 +100,22 @@
       "status": "Elevated"
     },
     {
-      "patient_id": "CN-88492",
-      "date": "2026-08-28 08:15 AM",
-      "bp": "122/80",
-      "hr": 72,
-      "glucose": 98,
-      "spo2": 99,
-      "status": "Normal"
+      "patient_id": "CN-73910",
+      "date": "2026-09-08 09:15 AM",
+      "bp": "138/88",
+      "hr": 76,
+      "glucose": 108,
+      "spo2": 98,
+      "status": "Elevated"
+    },
+    {
+      "patient_id": "CN-51204",
+      "date": "2026-09-08 10:00 AM",
+      "bp": "142/92",
+      "hr": 84,
+      "glucose": 145,
+      "spo2": 96,
+      "status": "High"
     }
   ],
   "medications": [
@@ -72,18 +127,67 @@
       "purpose": "Pre-diabetes blood glucose control"
     },
     {
-      "patient_id": "CN-88492",
       "id": "m2",
+      "patient_id": "CN-88492",
       "name": "Albuterol Inhaler (90mcg)",
       "frequency": "As needed (PRN)",
       "purpose": "Asthma rescue inhaler for bronchospasms"
     },
     {
-      "patient_id": "CN-88492",
       "id": "m3",
+      "patient_id": "CN-88492",
       "name": "Vitamin D3 (2000 IU)",
       "frequency": "Once daily in morning",
       "purpose": "Nutritional bone & immune support"
+    },
+    {
+      "id": "m4",
+      "patient_id": "CN-73910",
+      "name": "Lisinopril 10mg",
+      "frequency": "Once daily in morning",
+      "purpose": "Essential hypertension BP regulation"
+    },
+    {
+      "id": "m5",
+      "patient_id": "CN-51204",
+      "name": "Atorvastatin 20mg",
+      "frequency": "Once daily at bedtime",
+      "purpose": "Dyslipidemia and plaque stabilization"
+    }
+  ],
+  "appointments": [
+    {
+      "id": "apt-101",
+      "patient_id": "CN-88492",
+      "doctor_id": "DOC-1029",
+      "doctor_name": "Dr. Evelyn Reed, MD",
+      "specialty": "General Physician",
+      "appointment_date": "2026-09-15",
+      "time_slot": "10:00 AM",
+      "notes": "Follow-up HbA1c review & asthma assessment",
+      "status": "Confirmed"
+    },
+    {
+      "id": "apt-102",
+      "patient_id": "CN-73910",
+      "doctor_id": "DOC-1029",
+      "doctor_name": "Dr. Evelyn Reed, MD",
+      "specialty": "General Physician",
+      "appointment_date": "2026-09-15",
+      "time_slot": "11:30 AM",
+      "notes": "Hypertension blood pressure check and medication titration",
+      "status": "Confirmed"
+    },
+    {
+      "id": "apt-103",
+      "patient_id": "CN-51204",
+      "doctor_id": "DOC-1029",
+      "doctor_name": "Dr. Evelyn Reed, MD",
+      "specialty": "General Physician",
+      "appointment_date": "2026-09-16",
+      "time_slot": "02:00 PM",
+      "notes": "Cardiometabolic risk evaluation and lipid panel discussion",
+      "status": "Confirmed"
     }
   ],
   "doctors": [
@@ -94,7 +198,9 @@
       "experience": "14 years exp.",
       "hospital": "St. Jude Memorial Hospital",
       "rating": "4.9 ★ (180+ reviews)",
-      "availability": "Today & Tomorrow"
+      "availability": "Today & Tomorrow",
+      "license": "MED-499201",
+      "email": "dr.reed@stjude.org"
     },
     {
       "id": "d2",
@@ -103,7 +209,9 @@
       "experience": "18 years exp.",
       "hospital": "Metro Heart & Vascular Institute",
       "rating": "4.95 ★ (240+ reviews)",
-      "availability": "Tomorrow, 10:00 AM"
+      "availability": "Tomorrow, 10:00 AM",
+      "license": "MED-338291",
+      "email": "dr.vance@metroheart.org"
     },
     {
       "id": "d3",
@@ -112,7 +220,9 @@
       "experience": "12 years exp.",
       "hospital": "City Center Digestive Health",
       "rating": "4.85 ★ (110+ reviews)",
-      "availability": "Wednesday, 02:00 PM"
+      "availability": "Wednesday, 02:00 PM",
+      "license": "MED-281943",
+      "email": "dr.chen@citydigestive.org"
     }
   ]
 }

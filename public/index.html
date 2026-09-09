@@ -212,8 +212,19 @@
                 </div>
             </div>
 
+            <!-- Role Portal Switcher Button -->
+            <button class="btn btn-outline" id="switchRoleBtn" title="Toggle between Patient Portal and Doctor Station" style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.82rem; border-color: var(--primary); color: var(--primary);">
+                <i class="fa-solid fa-arrows-rotate"></i> <span id="switchRoleText">Switch to Doctor Station</span>
+            </button>
+
             <button class="btn btn-emergency" id="emergencyCardBtn">
                 <i class="fa-solid fa-triangle-exclamation"></i> Emergency SOS
+            </button>
+            <button class="btn" id="providerStatusBtn" style="display: none; background: rgba(13, 148, 136, 0.15); color: var(--teal); border: 1px solid var(--teal); font-weight: 600; font-size: 0.82rem;">
+                <i class="fa-solid fa-stethoscope"></i> Provider: On Duty
+            </button>
+            <button class="btn btn-outline" id="openDatabaseBtn" title="Live Database Inspector">
+                <i class="fa-solid fa-database"></i>
             </button>
             <button class="btn btn-outline" id="openSettingsBtn" title="API Settings">
                 <i class="fa-solid fa-gear"></i>
@@ -228,7 +239,8 @@
     <div class="app-layout">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
-            <nav class="nav-menu">
+            <!-- Navigation Menu for Patient -->
+            <nav class="nav-menu" id="patientNavMenu">
                 <button class="nav-item active" data-tab="triage">
                     <i class="fa-solid fa-compass"></i>
                     <span>AI Care Triage</span>
@@ -251,8 +263,32 @@
                 </button>
             </nav>
 
-            <!-- Quick Vitals Snapshot Widget -->
-            <div class="sidebar-vitals-card">
+            <!-- Navigation Menu for Doctor -->
+            <nav class="nav-menu" id="doctorNavMenu" style="display: none;">
+                <button class="nav-item active" data-tab="doc-dashboard">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Provider Station</span>
+                </button>
+                <button class="nav-item" data-tab="doc-patients">
+                    <i class="fa-solid fa-hospital-user"></i>
+                    <span>Patient Caseload (EHR)</span>
+                </button>
+                <button class="nav-item" data-tab="doc-schedule">
+                    <i class="fa-solid fa-calendar-check"></i>
+                    <span>Consultations Queue</span>
+                </button>
+                <button class="nav-item" data-tab="doc-prescriptions">
+                    <i class="fa-solid fa-prescription"></i>
+                    <span>e-Prescriptions (Rx)</span>
+                </button>
+                <button class="nav-item" data-tab="doc-cdss">
+                    <i class="fa-solid fa-dna"></i>
+                    <span>Clinical Decision Copilot</span>
+                </button>
+            </nav>
+
+            <!-- Quick Vitals Snapshot Widget (For Patient) -->
+            <div class="sidebar-vitals-card" id="patientSidebarWidget">
                 <h4><i class="fa-solid fa-heart-circle-check"></i> Latest Vitals</h4>
                 <div class="vital-mini">
                     <span>Blood Pressure</span>
@@ -272,10 +308,31 @@
                 </div>
             </div>
 
+            <!-- Provider Duty Status Widget (For Doctor) -->
+            <div class="sidebar-vitals-card" id="doctorSidebarWidget" style="display: none; background: #0f172a; border-color: rgba(13, 148, 136, 0.3);">
+                <h4 style="color: #2dd4bf;"><i class="fa-solid fa-stethoscope"></i> Clinical Station</h4>
+                <div class="vital-mini">
+                    <span>Provider Duty</span>
+                    <strong style="color: #2dd4bf;">Active On-Call</strong>
+                </div>
+                <div class="vital-mini">
+                    <span>Assigned Patients</span>
+                    <strong id="miniDocPatientsCount">3 Patients</strong>
+                </div>
+                <div class="vital-mini">
+                    <span>Next Consult</span>
+                    <strong>10:00 AM (Alex Morgan)</strong>
+                </div>
+                <div class="vital-mini">
+                    <span>Flagged Alert</span>
+                    <strong style="color: #f87171;">Marcus Bell (High BP)</strong>
+                </div>
+            </div>
+
             <!-- Disclaimer Notice -->
             <div class="medical-disclaimer">
                 <i class="fa-solid fa-shield-halved"></i>
-                <small>CareNav AI assists with health management & navigation. In immediate life-threatening emergencies, call 911 or visit the nearest ER.</small>
+                <small id="sidebarDisclaimerText">CareNav AI assists with health management & navigation. In immediate life-threatening emergencies, call 911 or visit the nearest ER.</small>
             </div>
         </aside>
 
@@ -594,6 +651,329 @@
                     </div>
                 </div>
             </section>
+
+            <!-- ================= DOCTOR TAB 1: CLINICAL PROVIDER STATION ================= -->
+            <section id="tab-doc-dashboard" class="tab-pane">
+                <div class="section-banner" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; border-left: 4px solid var(--teal);">
+                    <div class="banner-text">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                            <span class="status-pill" style="background: rgba(45, 212, 191, 0.2); color: #2dd4bf; border: 1px solid rgba(45, 212, 191, 0.4);">
+                                <i class="fa-solid fa-user-doctor"></i> Attending Physician Station
+                            </span>
+                            <span style="font-size: 0.8rem; color: #94a3b8;">St. Jude Medical Center &bull; Internal Medicine & Cardiology</span>
+                        </div>
+                        <h2 style="color: #ffffff;"><i class="fa-solid fa-stethoscope" style="color: var(--teal);"></i> Clinical Command & Caseload Telemetry</h2>
+                        <p style="color: #cbd5e1;">Real-time oversight of assigned inpatient & outpatient rosters, live vitals telemetry alerts, pending telehealth appointments, and clinical decision support.</p>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <button class="btn btn-sm" id="docQuickPrescribeBtn" style="background: var(--teal); color: #ffffff;">
+                            <i class="fa-solid fa-prescription"></i> Quick e-Rx
+                        </button>
+                        <button class="btn btn-sm btn-outline" id="docQuickScheduleBtn" style="color: #ffffff; border-color: #475569;">
+                            <i class="fa-solid fa-calendar-check"></i> Consultations
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Doctor KPI Telemetry Grid -->
+                <div class="doctor-kpi-grid">
+                    <div class="doctor-kpi-card">
+                        <div class="kpi-icon kpi-icon-blue"><i class="fa-solid fa-hospital-user"></i></div>
+                        <div class="kpi-content">
+                            <span>Active Caseload</span>
+                            <h3 id="docKpiCaseload">3</h3>
+                            <small>Assigned roster patients</small>
+                        </div>
+                    </div>
+                    <div class="doctor-kpi-card">
+                        <div class="kpi-icon kpi-icon-teal"><i class="fa-solid fa-video"></i></div>
+                        <div class="kpi-content">
+                            <span>Today's Consults</span>
+                            <h3 id="docKpiConsults">2</h3>
+                            <small>1 Telehealth &bull; 1 In-Clinic</small>
+                        </div>
+                    </div>
+                    <div class="doctor-kpi-card">
+                        <div class="kpi-icon kpi-icon-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="kpi-content">
+                            <span>Critical Alerts</span>
+                            <h3 id="docKpiAlerts" style="color: #f59e0b;">1</h3>
+                            <small>Marcus Bell (Stage 1 HTN)</small>
+                        </div>
+                    </div>
+                    <div class="doctor-kpi-card">
+                        <div class="kpi-icon kpi-icon-purple"><i class="fa-solid fa-prescription-bottle-medical"></i></div>
+                        <div class="kpi-content">
+                            <span>Active Regimens</span>
+                            <h3 id="docKpiMeds">4</h3>
+                            <small>Verified active formularies</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2-Column Doctor Dashboard Grid -->
+                <div class="records-grid" style="margin-top: 24px;">
+                    <!-- Left Column: Today's Consultation Schedule -->
+                    <div class="records-column">
+                        <div class="card-header" style="margin-bottom: 16px;">
+                            <h3><i class="fa-solid fa-clock" style="color: var(--primary);"></i> Today's Consultation Queue</h3>
+                            <button class="btn btn-outline btn-sm" id="viewFullScheduleBtn">View All</button>
+                        </div>
+                        <div id="docDashboardScheduleList" style="display: flex; flex-direction: column; gap: 12px;">
+                            <!-- Populated dynamically via app.js -->
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Patient Vitals Telemetry & Priority Alerts -->
+                    <div class="records-column">
+                        <div class="card-header" style="margin-bottom: 16px;">
+                            <h3><i class="fa-solid fa-heart-pulse" style="color: var(--danger);"></i> Priority Clinical Vitals Alerts</h3>
+                            <span class="status-pill status-critical"><i class="fa-solid fa-circle"></i> Live Feed</span>
+                        </div>
+                        <div id="docDashboardAlertsList" style="display: flex; flex-direction: column; gap: 12px;">
+                            <!-- Populated dynamically via app.js -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= DOCTOR TAB 2: PATIENT CASELOAD (EHR) ================= -->
+            <section id="tab-doc-patients" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-hospital-user" style="color: var(--primary);"></i> Assigned Patient Caseload & EHR Charts</h2>
+                        <p>Complete Electronic Health Records of patients under your direct care. View historical biometric vitals trends, diagnose conditions, review active medications, and initiate e-prescriptions.</p>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span class="status-pill status-stable"><i class="fa-solid fa-shield-halved"></i> HIPAA / HITECH Compliant</span>
+                    </div>
+                </div>
+
+                <!-- Search & Filters -->
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; flex-wrap: wrap;">
+                    <div style="position: relative; flex: 1; max-width: 380px;">
+                        <input type="text" id="docPatientSearch" class="form-control" placeholder="Search patients by name, ID, or condition..." style="padding-left: 36px;">
+                        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-sm btn-primary filter-patient-btn active" data-filter="all">All Patients (3)</button>
+                        <button class="btn btn-sm btn-outline filter-patient-btn" data-filter="critical" style="color: var(--danger); border-color: var(--danger);">Flagged Vitals (1)</button>
+                        <button class="btn btn-sm btn-outline filter-patient-btn" data-filter="stable">Stable (2)</button>
+                    </div>
+                </div>
+
+                <!-- Patients Table -->
+                <div class="doctor-table-wrapper">
+                    <table class="doctor-table" id="doctorPatientsTable">
+                        <thead>
+                            <tr>
+                                <th>Patient Name & ID</th>
+                                <th>Demographics</th>
+                                <th>Chronic Diagnoses</th>
+                                <th>Latest Vitals (BP / HR / SpO2)</th>
+                                <th>Active Meds</th>
+                                <th>Triage Status</th>
+                                <th>Clinical Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="doctorPatientsTableBody">
+                            <!-- Populated dynamically via app.js -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ================= DOCTOR TAB 3: CONSULTATIONS & TELEHEALTH QUEUE ================= -->
+            <section id="tab-doc-schedule" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-calendar-check" style="color: var(--teal);"></i> Consultation Schedule & Virtual Telehealth Room</h2>
+                        <p>Manage daily booked patient visits, initiate encrypted HIPAA-compliant virtual telehealth video calls, and record clinical SOAP encounter notes.</p>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <span class="status-pill status-stable"><i class="fa-solid fa-video"></i> WebRTC Telehealth Engine Active</span>
+                    </div>
+                </div>
+
+                <!-- Consultation Filter Tabs -->
+                <div style="display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap;">
+                    <button class="btn btn-sm btn-primary doc-appt-filter active" data-filter="all">All Appointments</button>
+                    <button class="btn btn-sm btn-outline doc-appt-filter" data-filter="confirmed">Confirmed / Ready</button>
+                    <button class="btn btn-sm btn-outline doc-appt-filter" data-filter="completed">Completed Visits</button>
+                </div>
+
+                <div id="doctorConsultationsContainer" style="display: flex; flex-direction: column; gap: 14px;">
+                    <!-- Populated dynamically via app.js -->
+                </div>
+            </section>
+
+            <!-- ================= DOCTOR TAB 4: ELECTRONIC PRESCRIPTIONS (e-Rx) ================= -->
+            <section id="tab-doc-prescriptions" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-prescription" style="color: #9333ea;"></i> Electronic Prescribing Station (e-Rx)</h2>
+                        <p>Directly author, modify, and transmit electronic prescriptions to community pharmacies with automated drug interaction screening and dosage verification.</p>
+                    </div>
+                    <span class="status-pill status-stable"><i class="fa-solid fa-certificate"></i> DEA EPCS Certified</span>
+                </div>
+
+                <div class="records-grid">
+                    <!-- Left: Prescribe Form -->
+                    <div class="records-column">
+                        <div class="records-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-pen-to-square" style="color: #9333ea;"></i> Authorize New Prescription</h3>
+                            </div>
+                            <form id="doctorPrescribeForm" style="margin-top: 16px;">
+                                <div class="form-group">
+                                    <label for="rxPatientSelect">Select Patient</label>
+                                    <select id="rxPatientSelect" class="form-control" required>
+                                        <option value="">-- Choose Patient Roster --</option>
+                                        <option value="PT-88492">Alex Morgan (ID: #CN-88492 &bull; 34 M)</option>
+                                        <option value="PT-1002">Sarah Jenkins (ID: #CN-1002 &bull; 29 F)</option>
+                                        <option value="PT-1003">Marcus Bell (ID: #CN-1003 &bull; 62 M)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group flex-1">
+                                        <label for="rxMedName">Medication Name & Strength</label>
+                                        <input type="text" id="rxMedName" class="form-control" placeholder="e.g. Lisinopril 10mg" required>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="rxDosage">Dosage & Frequency</label>
+                                        <input type="text" id="rxDosage" class="form-control" placeholder="e.g. 1 tablet daily orally in morning" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group flex-1">
+                                        <label for="rxPurpose">Clinical Indication</label>
+                                        <input type="text" id="rxPurpose" class="form-control" placeholder="e.g. Essential Hypertension" required>
+                                    </div>
+                                    <div class="form-group flex-1">
+                                        <label for="rxRefills">Refills Authorized</label>
+                                        <select id="rxRefills" class="form-control">
+                                            <option value="0">0 (No refills)</option>
+                                            <option value="1">1 refill</option>
+                                            <option value="2">2 refills</option>
+                                            <option value="3" selected>3 refills (90-day supply)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="rxInstructions">Patient Usage Instructions & Physician Notes</label>
+                                    <textarea id="rxInstructions" class="form-control" rows="2" placeholder="Take with food. Monitor blood pressure weekly. Report persistent dry cough."></textarea>
+                                </div>
+
+                                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 16px; font-size: 0.8rem; color: var(--text-secondary);">
+                                    <i class="fa-solid fa-circle-check" style="color: var(--teal);"></i> Automated Contraindication Check: No adverse penicillin or ACE/ARB cross-reactivity detected for selected medication.
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block" style="background: #9333ea; border-color: #9333ea;">
+                                    <i class="fa-solid fa-paper-plane"></i> Authorize & Transmit e-Prescription
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Right: Active Outpatient Prescriptions Issued -->
+                    <div class="records-column">
+                        <div class="records-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-list-check" style="color: var(--teal);"></i> Issued Outpatient Formularies</h3>
+                                <span class="badge badge-info" id="docRxCountBadge">4 Active Rx</span>
+                            </div>
+                            <div id="doctorIssuedRxList" style="display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+                                <!-- Populated dynamically via app.js -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= DOCTOR TAB 5: CLINICAL DECISION SUPPORT (CDSS) ================= -->
+            <section id="tab-doc-cdss" class="tab-pane">
+                <div class="section-banner" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color: #ffffff;">
+                    <div class="banner-text">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                            <span class="status-pill" style="background: rgba(167, 139, 250, 0.2); color: #c4b5fd; border: 1px solid rgba(167, 139, 250, 0.4);">
+                                <i class="fa-solid fa-dna"></i> Physician AI Copilot
+                            </span>
+                            <span style="font-size: 0.8rem; color: #cbd5e1;">Evidence-Based Guideline Directed Medical Therapy (GDMT)</span>
+                        </div>
+                        <h2 style="color: #ffffff;"><i class="fa-solid fa-brain" style="color: #a78bfa;"></i> Clinical Decision Support System (CDSS)</h2>
+                        <p style="color: #e2e8f0;">Advanced differential diagnosis assistance, cross-medication interaction evaluation, and diagnostic workup recommendations tailored for attending physicians.</p>
+                    </div>
+                </div>
+
+                <div class="records-grid">
+                    <!-- Left: Clinical Input & Presets -->
+                    <div class="records-column">
+                        <div class="records-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-notes-medical" style="color: #6366f1;"></i> Patient Case Presentation</h3>
+                            </div>
+
+                            <div style="margin-top: 14px; margin-bottom: 12px;">
+                                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                                    Load Clinical Vignette Preset:
+                                </label>
+                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                    <button class="btn btn-outline btn-sm cdss-preset-btn" data-preset="htn">
+                                        Uncontrolled HTN & Dyspnea (62yo M)
+                                    </button>
+                                    <button class="btn btn-outline btn-sm cdss-preset-btn" data-preset="asthma">
+                                        Refractory Wheezing & Cough (29yo F)
+                                    </button>
+                                    <button class="btn btn-outline btn-sm cdss-preset-btn" data-preset="metabolic">
+                                        Metabolic Syndrome & Fatigue (34yo M)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cdssCaseInput">Case Notes, Vitals & Laboratory Findings:</label>
+                                <textarea id="cdssCaseInput" class="form-control" rows="6" placeholder="Enter clinical presentation, pertinent past medical history, current vitals, and physical exam findings..."></textarea>
+                            </div>
+
+                            <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; font-size: 0.82rem; color: var(--text-secondary);">
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                    <input type="checkbox" id="cdssCheckInteractions" checked> Drug-Drug Screen
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                    <input type="checkbox" id="cdssCheckAhaGuidelines" checked> ACC/AHA & ADA Guidelines
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                                    <input type="checkbox" id="cdssCheckLabWorkup" checked> Diagnostic Lab Recommendations
+                                </label>
+                            </div>
+
+                            <button id="runCdssBtn" class="btn btn-primary btn-block" style="background: #6366f1; border-color: #6366f1; padding: 12px;">
+                                <i class="fa-solid fa-microscope"></i> Run Clinical Differential Diagnosis
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Differential Diagnosis & Evidence Output -->
+                    <div class="records-column">
+                        <div class="records-card">
+                            <div class="card-header">
+                                <h3><i class="fa-solid fa-clipboard-check" style="color: var(--teal);"></i> Differential Analysis & GDMT Protocol</h3>
+                                <span class="status-pill status-stable" id="cdssStatusBadge">Ready for Analysis</span>
+                            </div>
+
+                            <div id="cdssOutputArea" style="margin-top: 14px;">
+                                <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                                    <i class="fa-solid fa-dna" style="font-size: 2.5rem; margin-bottom: 12px; color: #cbd5e1;"></i>
+                                    <p>Select a clinical vignette above or enter patient presentation details to generate evidence-based differential diagnosis, contraindication warnings, and diagnostic orders.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -770,6 +1150,107 @@
             </div>
         </div>
     </div> <!-- Close #settingsModal -->
+
+    <!-- EHR Patient Medical Chart Inspector Modal -->
+    <div class="modal-backdrop" id="patientChartModal">
+        <div class="modal-card" style="max-width: 840px;">
+            <div class="modal-header" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-file-waveform" style="font-size: 1.4rem;"></i>
+                    <div>
+                        <h3 id="chartModalPatientName" style="color: #ffffff; margin: 0; font-size: 1.15rem;">Patient EHR Chart Inspector</h3>
+                        <small id="chartModalPatientMeta" style="color: #e0f2fe; font-size: 0.8rem;">Electronic Health Record &bull; Live Telemetry Feed</small>
+                    </div>
+                </div>
+                <button class="modal-close" id="closePatientChartModal" style="color: #ffffff;">&times;</button>
+            </div>
+            <div class="modal-body" id="patientChartBody" style="max-height: 75vh; overflow-y: auto; padding: 20px;">
+                <!-- Populated dynamically via app.js -->
+            </div>
+            <div style="padding: 12px 20px; background: #f8fafc; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.78rem; color: var(--text-muted);"><i class="fa-solid fa-lock"></i> Attending Physician Access Encrypted</span>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-outline btn-sm" id="chartPrintBtn"><i class="fa-solid fa-print"></i> Export Chart</button>
+                    <button class="btn btn-primary btn-sm" id="chartPrescribeBtn"><i class="fa-solid fa-prescription"></i> Prescribe Medication</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Telehealth Virtual Encounter Room Modal -->
+    <div class="modal-backdrop" id="telehealthModal">
+        <div class="modal-card" style="max-width: 960px;">
+            <div class="modal-header" style="background: #0f172a; color: #ffffff; border-bottom: 1px solid #334155;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 10px; height: 10px; border-radius: 50%; background: #10b981;"></div>
+                    <h3 style="color: #ffffff; margin: 0; font-size: 1.1rem;"><i class="fa-solid fa-video" style="color: var(--teal);"></i> CareNav Virtual Encounter &bull; Encrypted Telehealth</h3>
+                </div>
+                <button class="modal-close" id="closeTelehealthModal" style="color: #ffffff;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 20px; background: #f8fafc;">
+                <div class="telehealth-container">
+                    <!-- Left: Video Screen Simulation -->
+                    <div class="telehealth-video-screen">
+                        <div style="position: absolute; top: 16px; left: 16px; display: flex; gap: 8px;">
+                            <span class="badge" style="background: rgba(16, 185, 129, 0.9); color: #ffffff; font-size: 0.75rem;">
+                                <i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> REC &bull; 256-bit TLS
+                            </span>
+                            <span class="badge" id="telehealthTimer" style="background: rgba(0, 0, 0, 0.6); color: #ffffff; font-size: 0.75rem;">
+                                04:32
+                            </span>
+                        </div>
+
+                        <div id="telehealthPatientAvatar" style="text-align: center;">
+                            <div style="width: 110px; height: 110px; border-radius: 50%; background: #1e293b; color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 12px; border: 3px solid #38bdf8;">
+                                <i class="fa-solid fa-user-injured"></i>
+                            </div>
+                            <h4 id="telehealthPatientName" style="color: #ffffff; font-size: 1.2rem; font-weight: 700;">Alex Morgan</h4>
+                            <p id="telehealthCallStatus" style="color: #94a3b8; font-size: 0.85rem; margin-top: 4px;">Connected &bull; Audio/Video Stable &bull; 1080p 60fps</p>
+                        </div>
+
+                        <!-- Doctor PIP Camera Preview -->
+                        <div style="position: absolute; top: 16px; right: 16px; width: 100px; height: 75px; background: #1e293b; border-radius: var(--radius-sm); border: 2px solid #2dd4bf; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #ffffff; font-size: 0.7rem; box-shadow: var(--shadow-md);">
+                            <i class="fa-solid fa-user-doctor" style="font-size: 1.2rem; color: #2dd4bf; margin-bottom: 2px;"></i>
+                            <span>Dr. E. Reed (You)</span>
+                        </div>
+
+                        <!-- Call Controls -->
+                        <div class="telehealth-controls">
+                            <button class="control-btn" id="toggleMicBtn" title="Mute/Unmute Mic"><i class="fa-solid fa-microphone"></i></button>
+                            <button class="control-btn" id="toggleVideoBtn" title="Camera On/Off"><i class="fa-solid fa-video"></i></button>
+                            <button class="control-btn" id="toggleShareBtn" title="Share Medical Chart"><i class="fa-solid fa-display"></i></button>
+                            <button class="control-btn end-call" id="endTelehealthCallBtn" title="Conclude Consultation"><i class="fa-solid fa-phone-slash"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Clinical Encounter Notes & Vitals -->
+                    <div style="display: flex; flex-direction: column; gap: 14px;">
+                        <!-- Patient Mini Telemetry -->
+                        <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px;">
+                            <h4 style="font-size: 0.82rem; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 0.5px;">Live Biometric Telemetry</h4>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.82rem;">
+                                <div><span style="color: var(--text-muted);">BP:</span> <strong id="telehealthBp">120/80 mmHg</strong></div>
+                                <div><span style="color: var(--text-muted);">HR:</span> <strong id="telehealthHr">74 bpm</strong></div>
+                                <div><span style="color: var(--text-muted);">SpO2:</span> <strong id="telehealthSpo2">99%</strong></div>
+                                <div><span style="color: var(--text-muted);">Glucose:</span> <strong id="telehealthGl">96 mg/dL</strong></div>
+                            </div>
+                        </div>
+
+                        <!-- SOAP Notes -->
+                        <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; flex: 1; display: flex; flex-direction: column;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-primary); margin-bottom: 8px;">
+                                <i class="fa-solid fa-file-pen" style="color: var(--primary);"></i> Clinical SOAP Encounter Notes
+                            </h4>
+                            <textarea id="telehealthSoapNotes" class="form-control" style="flex: 1; min-height: 140px; font-size: 0.82rem; font-family: monospace;" placeholder="S (Subjective): Patient reports...&#10;O (Objective): Vitals stable...&#10;A (Assessment): Follow-up on...&#10;P (Plan): Continue current regimen..."></textarea>
+                            <button class="btn btn-primary btn-sm btn-block" id="saveSoapNoteBtn" style="margin-top: 10px;">
+                                <i class="fa-solid fa-floppy-disk"></i> Sign & Save SOAP Note to Chart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Database Inspector Modal -->
     <div class="modal-backdrop" id="databaseModal">
