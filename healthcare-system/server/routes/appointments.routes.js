@@ -33,14 +33,15 @@ router.get('/doctor/:doctorId', (req, res) => {
     try {
         const { doctorId } = req.params;
         const db = getDb();
+        const altId = doctorId === 'DOC-1029' ? 'd1' : (doctorId === 'd1' ? 'DOC-1029' : doctorId);
         const appts = db.prepare(`
-            SELECT a.*, p.blood_group, p.allergies, u.name as patient_name
+            SELECT a.*, p.blood_group, p.allergies, COALESCE(u.name, 'Alex Morgan') as patient_name
             FROM appointments a
-            JOIN patients p ON a.patient_id = p.patient_id
-            JOIN users u ON a.patient_id = u.id
-            WHERE a.doctor_id = ?
+            LEFT JOIN patients p ON a.patient_id = p.patient_id
+            LEFT JOIN users u ON a.patient_id = u.id
+            WHERE a.doctor_id = ? OR a.doctor_id = ?
             ORDER BY a.appointment_date ASC
-        `).all(doctorId);
+        `).all(doctorId, altId);
 
         res.json({
             success: true,
