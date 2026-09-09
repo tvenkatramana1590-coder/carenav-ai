@@ -116,20 +116,49 @@ function initSchema(db) {
     const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
     if (userCount === 0) {
         seedDatabase(db);
+    } else {
+        const apptCount = db.prepare('SELECT COUNT(*) as count FROM appointments').get().count;
+        if (apptCount === 0) {
+            seedAppointments(db);
+        }
+    }
+}
+
+function loadSeedData() {
+    try {
+        return require('../database/data.json');
+    } catch (e) {
+        if (fs.existsSync(SEED_DATA_PATH)) {
+            try {
+                return JSON.parse(fs.readFileSync(SEED_DATA_PATH, 'utf8'));
+            } catch (err) {}
+        }
+    }
+    return null;
+}
+
+function seedAppointments(db, data) {
+    const seedData = data || loadSeedData();
+    const appointments = (seedData && seedData.appointments) ? seedData.appointments : [
+        { id: "apt-101", patient_id: "CN-88492", doctor_id: "DOC-1029", doctor_name: "Dr. Evelyn Reed, MD", specialty: "General Physician", appointment_date: "2026-09-15", time_slot: "10:00 AM", notes: "Follow-up HbA1c review & asthma assessment", status: "Confirmed" },
+        { id: "apt-102", patient_id: "CN-73910", doctor_id: "DOC-1029", doctor_name: "Dr. Evelyn Reed, MD", specialty: "General Physician", appointment_date: "2026-09-15", time_slot: "11:30 AM", notes: "Hypertension blood pressure check and medication titration", status: "Confirmed" },
+        { id: "apt-103", patient_id: "CN-51204", doctor_id: "DOC-1029", doctor_name: "Dr. Evelyn Reed, MD", specialty: "General Physician", appointment_date: "2026-09-16", time_slot: "02:00 PM", notes: "Cardiometabolic risk evaluation and lipid panel discussion", status: "Confirmed" }
+    ];
+
+    const insertAppt = db.prepare(`
+        INSERT INTO appointments (id, patient_id, doctor_id, doctor_name, specialty, appointment_date, time_slot, notes, status)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    for (const a of appointments) {
+        try {
+            insertAppt.run(a.id, a.patient_id, a.doctor_id, a.doctor_name, a.specialty, a.appointment_date, a.time_slot, a.notes, a.status || 'Confirmed');
+        } catch (e) {}
     }
 }
 
 function seedDatabase(db) {
     console.log('Seeding initial CareNav AI healthcare records from data.json...');
-
-    let seedData = null;
-    if (fs.existsSync(SEED_DATA_PATH)) {
-        try {
-            seedData = JSON.parse(fs.readFileSync(SEED_DATA_PATH, 'utf8'));
-        } catch (e) {
-            console.error('Failed to parse data.json for seeding:', e.message);
-        }
-    }
+    const seedData = loadSeedData();
 
     // Default Seed Fallback
     const users = (seedData && seedData.users) ? seedData.users : [
