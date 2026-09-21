@@ -200,11 +200,11 @@
         </div>
 
         <div class="nav-patient-info">
-            <div id="serverStatusBadge" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(13, 148, 136, 0.12); color: var(--teal); border: 1px solid rgba(13, 148, 136, 0.3);">
+            <div id="serverStatusBadge" style="display: none; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(13, 148, 136, 0.12); color: var(--teal); border: 1px solid rgba(13, 148, 136, 0.3);">
                 <span id="serverStatusDot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--teal); display: inline-block;"></span>
                 <span id="serverStatusText">SQLite Backend Online</span>
             </div>
-            <div id="supabaseStatusBadge" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); cursor: pointer;" title="Supabase Cloud Database Status (Click to configure)">
+            <div id="supabaseStatusBadge" style="display: none; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); cursor: pointer;" title="Supabase Cloud Database Status (Click to configure)">
                 <span id="supabaseStatusDot" style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span>
                 <span id="supabaseStatusText"><i class="fa-solid fa-cloud"></i> Supabase Cloud</span>
             </div>
@@ -229,7 +229,7 @@
             <button class="btn" id="providerStatusBtn" style="display: none; background: rgba(13, 148, 136, 0.15); color: var(--teal); border: 1px solid var(--teal); font-weight: 600; font-size: 0.82rem;">
                 <i class="fa-solid fa-stethoscope"></i> Provider: On Duty
             </button>
-            <button class="btn btn-outline" id="openDatabaseBtn" title="Live Database Inspector">
+            <button class="btn btn-outline" id="openDatabaseBtn" title="Live Database Inspector" style="display: none;">
                 <i class="fa-solid fa-database"></i>
             </button>
             <button class="btn btn-outline" id="openSettingsBtn" title="API Settings">
@@ -1236,6 +1236,13 @@
                             <input type="checkbox" id="toggleShowExplainerTab" checked>
                         </label>
                     </div>
+                </div>
+
+                <!-- Database Inspector Launcher from Settings -->
+                <div style="margin-top: 14px; display: flex; justify-content: flex-end;">
+                    <button class="btn btn-outline btn-sm" id="openDbFromSettingsBtn" style="color: var(--teal); border-color: var(--teal); font-size: 0.8rem;">
+                        <i class="fa-solid fa-database"></i> Launch Database Inspector
+                    </button>
                 </div>
             </div>
         </div>

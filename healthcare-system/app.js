@@ -453,8 +453,8 @@ const CareNavSupabase = {
 // ================= COMPONENT VISIBILITY MANAGER =================
 const UIVisibilityManager = {
     defaults: {
-        showDbBtn: true,
-        showStatusBadges: true,
+        showDbBtn: false,
+        showStatusBadges: false,
         showRoleSwitcher: true,
         showEmergencyBtn: true,
         showVitalsWidget: true,
@@ -2077,6 +2077,16 @@ function initModals() {
             if (dbModal) dbModal.classList.remove('open');
             refreshSettingsModal();
             settingsModal.classList.add('open');
+        });
+    }
+
+    const openDbFromSettingsBtn = document.getElementById('openDbFromSettingsBtn');
+    if (openDbFromSettingsBtn) {
+        openDbFromSettingsBtn.addEventListener('click', () => {
+            settingsModal.classList.remove('open');
+            if (typeof renderDatabaseTab === 'function') renderDatabaseTab('users');
+            const dbModal = document.getElementById('databaseModal');
+            if (dbModal) dbModal.classList.add('open');
         });
     }
 
