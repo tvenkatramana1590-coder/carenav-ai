@@ -1193,6 +1193,50 @@
                     <button class="btn btn-outline btn-sm" id="removeKeyBtn">Remove Gemini Key</button>
                     <button class="btn btn-primary btn-sm" id="saveKeyBtn">Save Gemini Key</button>
                 </div>
+
+                <!-- Interface & Component Visibility Section -->
+                <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px; margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <h4 style="margin: 0; color: var(--text-primary); font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-eye-slash" style="color: var(--teal);"></i> Interface & Component Visibility
+                        </h4>
+                        <button class="btn btn-outline btn-sm" id="resetVisibilityBtn" style="font-size: 0.72rem; padding: 2px 8px;">Show All</button>
+                    </div>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 14px;">
+                        Toggle any button, badge, or navigation tab on or off to customize your workspace view.
+                    </p>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.83rem;">
+                        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 4px 0; border-bottom: 1px solid #edf2f7;">
+                            <span style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-database" style="width: 16px; color: var(--teal);"></i> Database Inspector Button</span>
+                            <input type="checkbox" id="toggleShowDbBtn" checked>
+                        </label>
+                        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 4px 0; border-bottom: 1px solid #edf2f7;">
+                            <span style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-server" style="width: 16px; color: var(--teal);"></i> Backend & Supabase Status Badges</span>
+                            <input type="checkbox" id="toggleShowStatusBadges" checked>
+                        </label>
+                        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 4px 0; border-bottom: 1px solid #edf2f7;">
+                            <span style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-arrows-rotate" style="width: 16px; color: var(--primary);"></i> Portal Role Switcher Button</span>
+                            <input type="checkbox" id="toggleShowRoleSwitcher" checked>
+                        </label>
+                        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 4px 0; border-bottom: 1px solid #edf2f7;">
+                            <span style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-triangle-exclamation" style="width: 16px; color: var(--danger);"></i> Emergency SOS Button</span>
+                            <input type="checkbox" id="toggleShowEmergencyBtn" checked>
+                        </label>
+                        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 4px 0; border-bottom: 1px solid #edf2f7;">
+                            <span style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-heart-pulse" style="width: 16px; color: var(--danger);"></i> Sidebar Quick Vitals Widget</span>
+                            <input type="checkbox" id="toggleShowVitalsWidget" checked>
+                        </label>
+                        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 4px 0; border-bottom: 1px solid #edf2f7;">
+                            <span style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-comments" style="width: 16px; color: var(--primary);"></i> AI Health Companion Tab</span>
+                            <input type="checkbox" id="toggleShowCompanionTab" checked>
+                        </label>
+                        <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 4px 0;">
+                            <span style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-brain" style="width: 16px; color: var(--teal);"></i> AI Lab Report Explainer Tab</span>
+                            <input type="checkbox" id="toggleShowExplainerTab" checked>
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
     </div> <!-- Close #settingsModal -->

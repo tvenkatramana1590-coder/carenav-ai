@@ -449,6 +449,105 @@ const CareNavSupabase = {
     }
 };
 
+
+// ================= COMPONENT VISIBILITY MANAGER =================
+const UIVisibilityManager = {
+    defaults: {
+        showDbBtn: true,
+        showStatusBadges: true,
+        showRoleSwitcher: true,
+        showEmergencyBtn: true,
+        showVitalsWidget: true,
+        showCompanionTab: true,
+        showExplainerTab: true
+    },
+
+    getSettings() {
+        try {
+            const saved = JSON.parse(localStorage.getItem('carenav_ui_visibility') || '{}');
+            return { ...this.defaults, ...saved };
+        } catch (e) {
+            return { ...this.defaults };
+        }
+    },
+
+    saveSettings(settings) {
+        localStorage.setItem('carenav_ui_visibility', JSON.stringify(settings));
+        this.applySettings(settings);
+    },
+
+    applySettings(settings = this.getSettings()) {
+        const dbBtn = document.getElementById('openDatabaseBtn');
+        const serverBadge = document.getElementById('serverStatusBadge');
+        const supabaseBadge = document.getElementById('supabaseStatusBadge');
+        const roleBtn = document.getElementById('switchRoleBtn');
+        const emergencyBtn = document.getElementById('emergencyCardBtn');
+        const vitalsWidget = document.getElementById('patientSidebarWidget');
+        const companionNav = document.querySelector('[data-tab="chat"]');
+        const explainerNav = document.querySelector('[data-tab="explainer"]');
+
+        if (dbBtn) dbBtn.style.display = settings.showDbBtn ? 'inline-flex' : 'none';
+        if (serverBadge) serverBadge.style.display = settings.showStatusBadges ? 'flex' : 'none';
+        if (supabaseBadge) supabaseBadge.style.display = settings.showStatusBadges ? 'flex' : 'none';
+        if (roleBtn) roleBtn.style.display = settings.showRoleSwitcher ? 'flex' : 'none';
+        if (emergencyBtn) emergencyBtn.style.display = settings.showEmergencyBtn ? 'inline-flex' : 'none';
+        if (vitalsWidget) vitalsWidget.style.display = settings.showVitalsWidget ? 'block' : 'none';
+        if (companionNav) companionNav.style.display = settings.showCompanionTab ? 'flex' : 'none';
+        if (explainerNav) explainerNav.style.display = settings.showExplainerTab ? 'flex' : 'none';
+    },
+
+    syncCheckboxes() {
+        const s = this.getSettings();
+        const chkDb = document.getElementById('toggleShowDbBtn');
+        const chkBadges = document.getElementById('toggleShowStatusBadges');
+        const chkRole = document.getElementById('toggleShowRoleSwitcher');
+        const chkEm = document.getElementById('toggleShowEmergencyBtn');
+        const chkVitals = document.getElementById('toggleShowVitalsWidget');
+        const chkChat = document.getElementById('toggleShowCompanionTab');
+        const chkExplainer = document.getElementById('toggleShowExplainerTab');
+
+        if (chkDb) chkDb.checked = s.showDbBtn;
+        if (chkBadges) chkBadges.checked = s.showStatusBadges;
+        if (chkRole) chkRole.checked = s.showRoleSwitcher;
+        if (chkEm) chkEm.checked = s.showEmergencyBtn;
+        if (chkVitals) chkVitals.checked = s.showVitalsWidget;
+        if (chkChat) chkChat.checked = s.showCompanionTab;
+        if (chkExplainer) chkExplainer.checked = s.showExplainerTab;
+    },
+
+    bindEvents() {
+        const toggleMap = [
+            { id: 'toggleShowDbBtn', key: 'showDbBtn' },
+            { id: 'toggleShowStatusBadges', key: 'showStatusBadges' },
+            { id: 'toggleShowRoleSwitcher', key: 'showRoleSwitcher' },
+            { id: 'toggleShowEmergencyBtn', key: 'showEmergencyBtn' },
+            { id: 'toggleShowVitalsWidget', key: 'showVitalsWidget' },
+            { id: 'toggleShowCompanionTab', key: 'showCompanionTab' },
+            { id: 'toggleShowExplainerTab', key: 'showExplainerTab' }
+        ];
+
+        toggleMap.forEach(({ id, key }) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('change', () => {
+                    const current = this.getSettings();
+                    current[key] = el.checked;
+                    this.saveSettings(current);
+                });
+            }
+        });
+
+        const resetBtn = document.getElementById('resetVisibilityBtn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                this.saveSettings(this.defaults);
+                this.syncCheckboxes();
+                if (typeof showToast === 'function') showToast('All interface components restored.', 'info');
+            });
+        }
+    }
+};
+
 // ================= MODERN CLINICAL TOAST NOTIFICATIONS =================
 function showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
@@ -727,6 +826,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Check backend API connection
     await CareNavAPI.checkHealth();
     CareNavSupabase.init();
+    UIVisibilityManager.applySettings();
+    UIVisibilityManager.bindEvents();
 
     // Check login state
     const current = JSON.parse(localStorage.getItem('carenav_current_user') || 'null');
@@ -1945,6 +2046,7 @@ function initModals() {
     const openSupabaseSettingsFromDbBtn = document.getElementById('openSupabaseSettingsFromDbBtn');
 
     function refreshSettingsModal() {
+        UIVisibilityManager.syncCheckboxes();
         if (geminiInput) geminiInput.value = HealthDB.geminiApiKey || '';
         if (supabaseUrlInput) supabaseUrlInput.value = localStorage.getItem('carenav_supabase_url') || 'https://xwexlavqmbrgthnljyeb.supabase.co';
         if (supabaseKeyInput) supabaseKeyInput.value = localStorage.getItem('carenav_supabase_key') || '';
