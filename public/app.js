@@ -272,7 +272,7 @@ const CareNavSupabase = {
     key: '',
 
     init() {
-        this.url = localStorage.getItem('carenav_supabase_url') || '';
+        this.url = localStorage.getItem('carenav_supabase_url') || 'https://xwexlavqmbrgthnljyeb.supabase.co';
         this.key = localStorage.getItem('carenav_supabase_key') || '';
         if (this.url && this.key && typeof window !== 'undefined' && window.supabase && window.supabase.createClient) {
             try {
@@ -1946,7 +1946,7 @@ function initModals() {
 
     function refreshSettingsModal() {
         if (geminiInput) geminiInput.value = HealthDB.geminiApiKey || '';
-        if (supabaseUrlInput) supabaseUrlInput.value = localStorage.getItem('carenav_supabase_url') || '';
+        if (supabaseUrlInput) supabaseUrlInput.value = localStorage.getItem('carenav_supabase_url') || 'https://xwexlavqmbrgthnljyeb.supabase.co';
         if (supabaseKeyInput) supabaseKeyInput.value = localStorage.getItem('carenav_supabase_key') || '';
         if (supabaseTestStatus) supabaseTestStatus.style.display = 'none';
 
