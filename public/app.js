@@ -464,7 +464,13 @@ const UIVisibilityManager = {
 
     getSettings() {
         try {
-            const saved = JSON.parse(localStorage.getItem('carenav_ui_visibility') || '{}');
+            const saved = JSON.parse(localStorage.getItem('carenav_ui_visibility_v2') || 'null');
+            if (!saved) {
+                const oldSaved = JSON.parse(localStorage.getItem('carenav_ui_visibility') || '{}');
+                const migrated = { ...this.defaults, ...oldSaved, showStatusBadges: false, showDbBtn: false };
+                localStorage.setItem('carenav_ui_visibility_v2', JSON.stringify(migrated));
+                return migrated;
+            }
             return { ...this.defaults, ...saved };
         } catch (e) {
             return { ...this.defaults };
@@ -472,7 +478,7 @@ const UIVisibilityManager = {
     },
 
     saveSettings(settings) {
-        localStorage.setItem('carenav_ui_visibility', JSON.stringify(settings));
+        localStorage.setItem('carenav_ui_visibility_v2', JSON.stringify(settings));
         this.applySettings(settings);
     },
 
