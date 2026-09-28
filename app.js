@@ -454,7 +454,6 @@ const CareNavSupabase = {
 const UIVisibilityManager = {
     defaults: {
         showDbBtn: false,
-        showStatusBadges: false,
         showRoleSwitcher: true,
         showEmergencyBtn: true,
         showVitalsWidget: true,
@@ -478,8 +477,6 @@ const UIVisibilityManager = {
 
     applySettings(settings = this.getSettings()) {
         const dbBtn = document.getElementById('openDatabaseBtn');
-        const serverBadge = document.getElementById('serverStatusBadge');
-        const supabaseBadge = document.getElementById('supabaseStatusBadge');
         const roleBtn = document.getElementById('switchRoleBtn');
         const emergencyBtn = document.getElementById('emergencyCardBtn');
         const vitalsWidget = document.getElementById('patientSidebarWidget');
@@ -487,8 +484,6 @@ const UIVisibilityManager = {
         const explainerNav = document.querySelector('[data-tab="explainer"]');
 
         if (dbBtn) dbBtn.style.display = settings.showDbBtn ? 'inline-flex' : 'none';
-        if (serverBadge) serverBadge.style.display = settings.showStatusBadges ? 'flex' : 'none';
-        if (supabaseBadge) supabaseBadge.style.display = settings.showStatusBadges ? 'flex' : 'none';
         if (roleBtn) roleBtn.style.display = settings.showRoleSwitcher ? 'flex' : 'none';
         if (emergencyBtn) emergencyBtn.style.display = settings.showEmergencyBtn ? 'inline-flex' : 'none';
         if (vitalsWidget) vitalsWidget.style.display = settings.showVitalsWidget ? 'block' : 'none';
@@ -499,7 +494,6 @@ const UIVisibilityManager = {
     syncCheckboxes() {
         const s = this.getSettings();
         const chkDb = document.getElementById('toggleShowDbBtn');
-        const chkBadges = document.getElementById('toggleShowStatusBadges');
         const chkRole = document.getElementById('toggleShowRoleSwitcher');
         const chkEm = document.getElementById('toggleShowEmergencyBtn');
         const chkVitals = document.getElementById('toggleShowVitalsWidget');
@@ -507,7 +501,6 @@ const UIVisibilityManager = {
         const chkExplainer = document.getElementById('toggleShowExplainerTab');
 
         if (chkDb) chkDb.checked = s.showDbBtn;
-        if (chkBadges) chkBadges.checked = s.showStatusBadges;
         if (chkRole) chkRole.checked = s.showRoleSwitcher;
         if (chkEm) chkEm.checked = s.showEmergencyBtn;
         if (chkVitals) chkVitals.checked = s.showVitalsWidget;
@@ -518,7 +511,6 @@ const UIVisibilityManager = {
     bindEvents() {
         const toggleMap = [
             { id: 'toggleShowDbBtn', key: 'showDbBtn' },
-            { id: 'toggleShowStatusBadges', key: 'showStatusBadges' },
             { id: 'toggleShowRoleSwitcher', key: 'showRoleSwitcher' },
             { id: 'toggleShowEmergencyBtn', key: 'showEmergencyBtn' },
             { id: 'toggleShowVitalsWidget', key: 'showVitalsWidget' },
