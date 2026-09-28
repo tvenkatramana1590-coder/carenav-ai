@@ -880,6 +880,28 @@ async function loginUser(user, saveToStorage = true) {
         role: user.role || "patient"
     };
 
+    if (user.role === 'patient') {
+        if (!HealthDB.doctorPatients) HealthDB.doctorPatients = [];
+        const pIdx = HealthDB.doctorPatients.findIndex(p => p.id === user.id);
+        const pRecord = {
+            id: user.id,
+            name: user.name,
+            age: user.age || 34,
+            gender: user.gender || "Male",
+            blood_type: user.bloodGroup || "O+",
+            allergies: Array.isArray(user.allergies) ? user.allergies.join(", ") : (user.allergies || "None"),
+            conditions: Array.isArray(user.chronicConditions) ? user.chronicConditions.join(", ") : (user.chronicConditions || "None"),
+            contact: user.email || user.emergencyContact || "patient@healthmail.com",
+            latest_vitals: { status: "Normal" }
+        };
+        if (pIdx === -1) {
+            HealthDB.doctorPatients.unshift(pRecord);
+        } else {
+            HealthDB.doctorPatients[pIdx].name = user.name;
+        }
+        localStorage.setItem('carenav_doctor_patients', JSON.stringify(HealthDB.doctorPatients));
+    }
+
     // Update Navbar Profile & Portal Elements
     const nameEl = document.getElementById('currentPatientName');
     const subEl = document.getElementById('currentPatientSub');
@@ -1998,21 +2020,76 @@ function initModals() {
         const slot = document.getElementById('apptSlot').value;
         const notes = document.getElementById('apptNotes').value;
 
+        const currentPatient = activeUser || JSON.parse(localStorage.getItem('carenav_current_user') || 'null');
+        const pName = currentPatient ? currentPatient.name : 'Alex Morgan';
+        const pId = currentPatient ? currentPatient.id : 'CN-88492';
+
         const record = {
             id: 'apt-' + Date.now(),
-            doctor: activeBookingDoctor ? activeBookingDoctor.name : "Physician",
-            specialty: activeBookingDoctor ? activeBookingDoctor.specialty : "Clinic",
+            patient_id: pId,
+            patient_name: pName,
+            patientId: pId,
+            patientName: pName,
+            doctor: activeBookingDoctor ? activeBookingDoctor.name : "Dr. Evelyn Reed, MD",
+            doctor_id: activeBookingDoctor ? activeBookingDoctor.id : "DOC-1029",
+            doctorId: activeBookingDoctor ? activeBookingDoctor.id : "DOC-1029",
+            specialty: activeBookingDoctor ? activeBookingDoctor.specialty : "General Physician",
             date: date,
+            appointment_date: date,
             slot: slot,
-            notes: notes || "General Consultation"
+            time_slot: slot,
+            notes: notes || "General Consultation",
+            status: "Confirmed"
         };
 
-        HealthDB.appointments.push(record);
+        HealthDB.appointments.unshift(record);
+        localStorage.setItem('carenav_appts', JSON.stringify(HealthDB.appointments));
 
-        if (CareNavAPI.isOnline && activeUser) {
+        // Sync directly to Doctor Station consultations list
+        if (!HealthDB.doctorAppointments) HealthDB.doctorAppointments = [];
+        const doctorApptRecord = {
+            id: record.id,
+            patient_id: pId,
+            patient_name: pName,
+            doctor_id: record.doctorId,
+            doctor_name: record.doctor,
+            specialty: record.specialty,
+            appointment_date: date,
+            time_slot: slot,
+            notes: record.notes,
+            status: "Confirmed",
+            type: "In-Clinic Visit"
+        };
+        const existingIdx = HealthDB.doctorAppointments.findIndex(a => a.id === doctorApptRecord.id);
+        if (existingIdx !== -1) {
+            HealthDB.doctorAppointments[existingIdx] = doctorApptRecord;
+        } else {
+            HealthDB.doctorAppointments.unshift(doctorApptRecord);
+        }
+        localStorage.setItem('carenav_doctor_appts', JSON.stringify(HealthDB.doctorAppointments));
+
+        // Sync patient to doctor patients list
+        if (!HealthDB.doctorPatients) HealthDB.doctorPatients = [];
+        if (!HealthDB.doctorPatients.some(p => p.id === pId)) {
+            HealthDB.doctorPatients.unshift({
+                id: pId,
+                name: pName,
+                age: currentPatient ? currentPatient.age || 34 : 34,
+                gender: currentPatient ? currentPatient.gender || 'Male' : 'Male',
+                blood_type: currentPatient ? currentPatient.bloodGroup || 'O+' : 'O+',
+                allergies: currentPatient ? currentPatient.allergies || 'None' : 'None',
+                conditions: currentPatient ? currentPatient.chronicConditions || 'None' : 'None',
+                contact: currentPatient ? currentPatient.email || 'patient@healthmail.com' : 'patient@healthmail.com',
+                latest_vitals: { status: 'Normal' }
+            });
+            localStorage.setItem('carenav_doctor_patients', JSON.stringify(HealthDB.doctorPatients));
+        }
+
+        if (CareNavAPI.isOnline) {
             CareNavAPI.bookAppointment({
-                patientId: activeUser.id,
-                doctorId: activeBookingDoctor ? activeBookingDoctor.id : null,
+                patientId: pId,
+                patientName: pName,
+                doctorId: record.doctorId,
                 doctorName: record.doctor,
                 specialty: record.specialty,
                 date: record.date,
@@ -2023,13 +2100,12 @@ function initModals() {
             });
         }
 
-        if (CareNavSupabase.isReady && activeUser) {
-            CareNavSupabase.syncAppointment({ id: record.id, patientId: activeUser.id, doctorId: activeBookingDoctor ? activeBookingDoctor.id : 'DOC-1029', doctorName: record.doctor, specialty: record.specialty, date: record.date, slot: record.slot, notes: record.notes });
+        if (CareNavSupabase.isReady) {
+            CareNavSupabase.syncAppointment({ id: record.id, patientId: pId, doctorId: record.doctorId, doctorName: record.doctor, specialty: record.specialty, date: record.date, slot: record.slot, notes: record.notes });
         }
 
-        localStorage.setItem('carenav_appts', JSON.stringify(HealthDB.appointments));
         bookingModal.classList.remove('open');
-        showToast(`Appointment confirmed with ${record.doctor} on ${record.date} at ${record.slot}!`, 'success');
+        showToast(`Appointment confirmed with ${record.doctor} for ${pName} on ${record.date} at ${record.slot}!`, 'success');
     });
 
     // Settings Modal & Supabase Cloud Database Configuration

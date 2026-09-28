@@ -73,7 +73,7 @@ router.get('/doctor/:doctorId', (req, res) => {
 // POST /api/appointments
 router.post('/', (req, res) => {
     try {
-        const { patientId, doctorId, doctorName, specialty, date, slot, time, time_slot, timeSlot, notes } = req.body;
+        const { patientId, patientName, doctorId, doctorName, specialty, date, slot, time, time_slot, timeSlot, notes } = req.body;
         const resolvedSlot = slot || time || time_slot || timeSlot;
 
         if (!patientId || !doctorName || !date || !resolvedSlot) {
@@ -83,10 +83,39 @@ router.post('/', (req, res) => {
         const id = 'apt-' + Date.now();
         const db = getDb();
 
+        if (patientName && patientId) {
+            const userExist = db.prepare('SELECT id FROM users WHERE id = ?').get(patientId);
+            if (!userExist) {
+                try {
+                    db.prepare('INSERT OR IGNORE INTO users (id, name, email, password_hash, role) VALUES (?, ?, ?, ?, ?)').run(
+                        patientId,
+                        patientName,
+                        patientId.toLowerCase() + '@healthmail.com',
+                        'hashed_password',
+                        'patient'
+                    );
+                } catch (e) {}
+            } else {
+                try {
+                    db.prepare('UPDATE users SET name = ? WHERE id = ?').run(patientName, patientId);
+                } catch (e) {}
+            }
+            const patientExist = db.prepare('SELECT patient_id FROM patients WHERE patient_id = ?').get(patientId);
+            if (!patientExist) {
+                try {
+                    db.prepare('INSERT OR IGNORE INTO patients (patient_id, user_id, blood_group) VALUES (?, ?, ?)').run(
+                        patientId,
+                        patientId,
+                        'O+'
+                    );
+                } catch (e) {}
+            }
+        }
+
         db.prepare(`
             INSERT INTO appointments (id, patient_id, doctor_id, doctor_name, specialty, appointment_date, time_slot, notes, status)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Confirmed')
-        `).run(id, patientId, doctorId || null, doctorName, specialty || 'General Medicine', date, resolvedSlot, notes || 'General Consultation');
+        `).run(id, patientId, doctorId || 'DOC-1029', doctorName, specialty || 'General Medicine', date, resolvedSlot, notes || 'General Consultation');
 
         res.status(201).json({
             success: true,
