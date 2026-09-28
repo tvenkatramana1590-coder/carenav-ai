@@ -200,14 +200,14 @@
         </div>
 
         <div class="nav-patient-info">
-            <!-- Status badges hidden: accessible via Settings > Interface & Component Visibility -->
-            <div id="serverStatusBadge" style="display: none;">
-                <span id="serverStatusDot"></span>
+            <!-- Status badges (hidden by default on navbar interface; toggleable in Settings) -->
+            <div id="serverStatusBadge" style="display: none; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(13, 148, 136, 0.12); color: var(--teal); border: 1px solid rgba(13, 148, 136, 0.3);">
+                <span id="serverStatusDot" style="width: 8px; height: 8px; border-radius: 50%; background: var(--teal); display: inline-block;"></span>
                 <span id="serverStatusText">SQLite Backend Online</span>
             </div>
-            <div id="supabaseStatusBadge" style="display: none;">
-                <span id="supabaseStatusDot"></span>
-                <span id="supabaseStatusText">Supabase Cloud</span>
+            <div id="supabaseStatusBadge" style="display: none; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.3); cursor: pointer;" title="Supabase Cloud Database Status (Click to configure)">
+                <span id="supabaseStatusDot" style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span>
+                <span id="supabaseStatusText"><i class="fa-solid fa-cloud"></i> Supabase Cloud</span>
             </div>
             <div class="patient-badge" id="patientBadge">
                 <div class="avatar" id="navAvatar">
@@ -1214,7 +1214,7 @@
                         </label>
                         <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 4px 0; border-bottom: 1px solid #edf2f7;">
                             <span style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-server" style="width: 16px; color: var(--teal);"></i> Backend & Supabase Status Badges</span>
-                            <input type="checkbox" id="toggleShowStatusBadges" checked>
+                            <input type="checkbox" id="toggleShowStatusBadges">
                         </label>
                         <label style="display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 4px 0; border-bottom: 1px solid #edf2f7;">
                             <span style="display: flex; align-items: center; gap: 8px;"><i class="fa-solid fa-arrows-rotate" style="width: 16px; color: var(--primary);"></i> Portal Role Switcher Button</span>
