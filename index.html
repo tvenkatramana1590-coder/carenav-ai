@@ -365,7 +365,12 @@
                         <p class="card-subtitle">Be as specific as possible (location, severity 1-10, duration, and triggers).</p>
 
                         <div class="form-group">
-                            <label for="symptomInput">What are you feeling?</label>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label for="symptomInput" style="margin: 0;">What are you feeling?</label>
+                                <button type="button" class="btn btn-outline btn-sm" id="voiceSymptomBtn" style="font-size: 0.75rem; padding: 2px 8px; color: var(--teal); border-color: var(--teal);" title="Click to dictate symptoms with your microphone">
+                                    <i class="fa-solid fa-microphone"></i> Dictate Voice
+                                </button>
+                            </div>
                             <textarea id="symptomInput" class="form-control" rows="4" placeholder="e.g. I have sharp throbbing headache on my right side with light sensitivity and mild nausea since yesterday morning..."></textarea>
                         </div>
 
@@ -459,9 +464,17 @@
                         <h2><i class="fa-solid fa-file-medical"></i> Electronic Health Records (EHR)</h2>
                         <p>Centralized medical history, active prescriptions, tracked vitals, and laboratory documents.</p>
                     </div>
-                    <button class="btn btn-primary" id="openAddVitalModal">
-                        <i class="fa-solid fa-plus"></i> Record New Vital
-                    </button>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-outline btn-sm" id="patientExportPdfBtn" style="color: var(--teal); border-color: var(--teal);">
+                            <i class="fa-solid fa-file-pdf"></i> Download PDF Passport
+                        </button>
+                        <button class="btn btn-outline btn-sm" id="patientExportFhirBtn" style="color: #2563eb; border-color: #2563eb;">
+                            <i class="fa-solid fa-code"></i> Export FHIR R4 JSON
+                        </button>
+                        <button class="btn btn-primary btn-sm" id="openAddVitalModal">
+                            <i class="fa-solid fa-plus"></i> Record New Vital
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Patient Overview Strip -->
@@ -1269,6 +1282,8 @@
                 <span style="font-size: 0.78rem; color: var(--text-muted);"><i class="fa-solid fa-lock"></i> Attending Physician Access Encrypted</span>
                 <div style="display: flex; gap: 8px;">
                     <button class="btn btn-outline btn-sm" id="chartPrintBtn"><i class="fa-solid fa-print"></i> Export Chart</button>
+                    <button class="btn btn-outline btn-sm" id="modalExportPdfBtn" style="color: var(--teal); border-color: var(--teal);"><i class="fa-solid fa-file-pdf"></i> PDF Passport</button>
+                    <button class="btn btn-outline btn-sm" id="modalExportFhirBtn" style="color: #2563eb; border-color: #2563eb;"><i class="fa-solid fa-code"></i> FHIR R4 JSON</button>
                     <button class="btn btn-primary btn-sm" id="chartPrescribeBtn"><i class="fa-solid fa-prescription"></i> Prescribe Medication</button>
                 </div>
             </div>
@@ -1336,9 +1351,14 @@
 
                         <!-- SOAP Notes -->
                         <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px; flex: 1; display: flex; flex-direction: column;">
-                            <h4 style="font-size: 0.85rem; color: var(--text-primary); margin-bottom: 8px;">
-                                <i class="fa-solid fa-file-pen" style="color: var(--primary);"></i> Clinical SOAP Encounter Notes
-                            </h4>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <h4 style="font-size: 0.85rem; color: var(--text-primary); margin: 0;">
+                                    <i class="fa-solid fa-file-pen" style="color: var(--primary);"></i> Clinical SOAP Encounter Notes
+                                </h4>
+                                <button type="button" class="btn btn-outline btn-sm" id="autoSoapBtn" style="font-size: 0.75rem; padding: 2px 8px; color: var(--teal); border-color: var(--teal);" title="Auto-generate clinical SOAP notes using AI">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Auto AI SOAP Note
+                                </button>
+                            </div>
                             <textarea id="telehealthSoapNotes" class="form-control" style="flex: 1; min-height: 140px; font-size: 0.82rem; font-family: monospace;" placeholder="S (Subjective): Patient reports...&#10;O (Objective): Vitals stable...&#10;A (Assessment): Follow-up on...&#10;P (Plan): Continue current regimen..."></textarea>
                             <button class="btn btn-primary btn-sm btn-block" id="saveSoapNoteBtn" style="margin-top: 10px;">
                                 <i class="fa-solid fa-floppy-disk"></i> Sign & Save SOAP Note to Chart
