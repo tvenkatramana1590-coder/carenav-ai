@@ -54,7 +54,7 @@ body {
 .navbar {
     background: #ffffff;
     border-bottom: 1px solid var(--border-color);
-    padding: 12px 24px;
+    padding: 10px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -62,24 +62,26 @@ body {
     top: 0;
     z-index: 50;
     box-shadow: var(--shadow-sm);
+    gap: 16px;
 }
 
 .nav-brand {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
 }
 
 .brand-logo {
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
     background: linear-gradient(135deg, var(--teal), var(--primary));
     color: white;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     box-shadow: 0 4px 10px rgba(13, 148, 136, 0.3);
 }
 
@@ -88,6 +90,7 @@ body {
     font-weight: 800;
     color: var(--text-primary);
     letter-spacing: -0.5px;
+    line-height: 1.2;
 }
 
 .brand-info h1 span {
@@ -95,14 +98,23 @@ body {
 }
 
 .brand-info p {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--text-muted);
+    letter-spacing: -0.2px;
 }
 
 .nav-patient-info {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.nav-search-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .patient-badge {
@@ -110,21 +122,23 @@ body {
     align-items: center;
     gap: 10px;
     background: var(--bg-main);
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: var(--radius-lg);
     border: 1px solid var(--border-color);
+    transition: background 0.2s ease, border-color 0.2s ease;
 }
 
 .avatar {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     background: var(--primary-light);
     color: var(--primary-dark);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    flex-shrink: 0;
 }
 
 .patient-meta {
@@ -134,12 +148,13 @@ body {
 
 .p-name {
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: var(--text-primary);
+    line-height: 1.2;
 }
 
 .p-sub {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     color: var(--text-muted);
 }
 
@@ -1202,7 +1217,56 @@ body {
 }
 
 /* Responsive Styles */
+@media (max-width: 1024px) {
+    .navbar {
+        padding: 10px 16px;
+        gap: 12px;
+    }
+    .brand-info p {
+        display: none;
+    }
+    #globalSearchInput {
+        width: 160px !important;
+    }
+}
+
 @media (max-width: 768px) {
+    .navbar {
+        padding: 8px 12px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .nav-brand {
+        gap: 8px;
+    }
+    .brand-logo {
+        width: 34px;
+        height: 34px;
+        font-size: 1.05rem;
+    }
+    .brand-info h1 {
+        font-size: 1.1rem;
+    }
+    .nav-patient-info {
+        gap: 6px;
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+    }
+    .nav-patient-info::-webkit-scrollbar {
+        display: none;
+    }
+    #globalSearchInput {
+        width: 130px !important;
+    }
+    .patient-badge {
+        padding: 4px 8px;
+    }
+    .p-sub {
+        display: none;
+    }
     .app-layout {
         flex-direction: column;
     }
