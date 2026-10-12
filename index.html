@@ -9,12 +9,164 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Supabase JS Client SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
     <!-- ================= VIEW 1: AUTHENTICATION (LOGIN & SIGN UP) ================= -->
-    <div id="authScreen" class="auth-wrapper">
+    
+    <!-- ================= VIEW 0: LANDING PAGE ================= -->
+    <div id="landingScreen" class="landing-wrapper">
+        <header class="landing-nav">
+            
+        <button class="btn btn-outline" id="toggleSidebarBtn" title="Toggle Sidebar" style="padding: 8px 12px;">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="nav-brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
+                <div class="brand-info">
+                    <h1 style="color: #ffffff;">CareNav <span style="color: #38bdf8;">AI</span></h1>
+                    <p style="color: #94a3b8;">Healthcare Records & Care Navigation</p>
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button class="btn btn-outline" id="landingSignInBtn" style="color: #ffffff; border-color: rgba(255,255,255,0.3);">Sign In</button>
+                <button class="btn btn-primary" id="landingGetStartedBtn" style="background: #0284c7; border-color: #0284c7;">Get Started</button>
+            </div>
+        </header>
+
+        <section class="landing-hero">
+            <div>
+                <div class="hero-badge">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI-Powered Healthcare Record & Care Navigation
+                </div>
+                <h1 class="hero-title">CareNav-AI</h1>
+                <div class="hero-tagline">"Your Health, Organized. Your Care, Guided."</div>
+                <p class="hero-subtitle">
+                    An AI-powered healthcare record and care-navigation platform designed to organize your health information and help you navigate your healthcare journey with confidence.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" id="heroGetStartedBtn" style="padding: 14px 28px; font-size: 1.05rem; background: #0284c7; border-color: #0284c7;">
+                        <i class="fa-solid fa-rocket"></i> GET STARTED
+                    </button>
+                    <button class="btn btn-outline" id="heroExploreBtn" style="padding: 14px 28px; font-size: 1.05rem; color: #ffffff; border-color: rgba(255,255,255,0.3);">
+                        <i class="fa-solid fa-compass"></i> EXPLORE FEATURES
+                    </button>
+                </div>
+            </div>
+
+            <div class="hero-visual-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div style="width: 38px; height: 38px; border-radius: 50%; background: #0284c7; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+                            <i class="fa-solid fa-shield-halved"></i>
+                        </div>
+                        <div>
+                            <h4 style="color: #ffffff; margin: 0; font-size: 0.95rem;">CareNav Clinical Passport</h4>
+                            <small style="color: #38bdf8;">Real-Time Health Engine Active</small>
+                        </div>
+                    </div>
+                    <span class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399;">Verified HIPAA Compliant</span>
+                </div>
+
+                <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+                    <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 6px;">LATEST AI HEALTH SUMMARY</div>
+                    <p style="font-size: 0.88rem; color: #f1f5f9; margin: 0;">
+                        Biometric vitals show stable glycemic & BP levels. Next recommended milestone: Routine HbA1c review in 30 days.
+                    </p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.82rem;">
+                    <div style="background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+                        <span style="color: #94a3b8;">Organized Records</span>
+                        <h4 style="color: #38bdf8; margin-top: 4px; font-size: 1.1rem;">8 Records</h4>
+                    </div>
+                    <div style="background: rgba(15, 23, 42, 0.6); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+                        <span style="color: #94a3b8;">Care Navigator</span>
+                        <h4 style="color: #34d399; margin-top: 4px; font-size: 1.1rem;">Active Guidance</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Overview -->
+        <section class="landing-section" id="landingFeatures">
+            <h2 class="landing-section-title">FEATURES</h2>
+            <p class="landing-section-sub">Comprehensive tools designed for intelligent health management</p>
+
+            <div class="features-grid-3">
+                <div class="feature-card-item">
+                    <div style="font-size: 2.2rem; margin-bottom: 16px;">📋</div>
+                    <h3 style="color: #ffffff; font-size: 1.25rem; margin-bottom: 10px;">Health Records</h3>
+                    <p style="color: #94a3b8; font-size: 0.92rem; line-height: 1.5; margin: 0;">
+                        Organize healthcare information, medical reports, prescriptions, and lab tests in one secure, structured dashboard.
+                    </p>
+                </div>
+                <div class="feature-card-item">
+                    <div style="font-size: 2.2rem; margin-bottom: 16px;">🤖</div>
+                    <h3 style="color: #ffffff; font-size: 1.25rem; margin-bottom: 10px;">AI Health Insights</h3>
+                    <p style="color: #94a3b8; font-size: 0.92rem; line-height: 1.5; margin: 0;">
+                        Understand complex medical information through AI-assisted plain-English summaries, biometric trends, and observation alerts.
+                    </p>
+                </div>
+                <div class="feature-card-item">
+                    <div style="font-size: 2.2rem; margin-bottom: 16px;">🧭</div>
+                    <h3 style="color: #ffffff; font-size: 1.25rem; margin-bottom: 10px;">Care Navigation</h3>
+                    <p style="color: #94a3b8; font-size: 0.92rem; line-height: 1.5; margin: 0;">
+                        Navigate toward relevant healthcare resources, specialists, diagnostic facilities, and doctor consultation preparation.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How CareNav-AI Works 5-Step Visual Flow -->
+        <section class="landing-section">
+            <h2 class="landing-section-title">How CareNav-AI Works</h2>
+            <p class="landing-section-sub">A seamless 5-step pathway from raw documents to actionable care navigation</p>
+
+            <div class="flow-stepper-container">
+                <div class="flow-step-item">
+                    <div class="flow-step-num">1</div>
+                    <h4 style="color: #ffffff; font-size: 0.95rem; margin-bottom: 4px;">Upload Records</h4>
+                    <p style="color: #94a3b8; font-size: 0.78rem; margin: 0;">PDF, JPG, PNG medical reports</p>
+                </div>
+                <div class="flow-step-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="flow-step-item">
+                    <div class="flow-step-num">2</div>
+                    <h4 style="color: #ffffff; font-size: 0.95rem; margin-bottom: 4px;">AI Processing</h4>
+                    <p style="color: #94a3b8; font-size: 0.78rem; margin: 0;">Text OCR & Extraction</p>
+                </div>
+                <div class="flow-step-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="flow-step-item">
+                    <div class="flow-step-num">3</div>
+                    <h4 style="color: #ffffff; font-size: 0.95rem; margin-bottom: 4px;">Structured Info</h4>
+                    <p style="color: #94a3b8; font-size: 0.78rem; margin: 0;">Organized clinical tables</p>
+                </div>
+                <div class="flow-step-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="flow-step-item">
+                    <div class="flow-step-num">4</div>
+                    <h4 style="color: #ffffff; font-size: 0.95rem; margin-bottom: 4px;">AI Insights</h4>
+                    <p style="color: #94a3b8; font-size: 0.78rem; margin: 0;">Plain-English summaries & trends</p>
+                </div>
+                <div class="flow-step-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="flow-step-item">
+                    <div class="flow-step-num">5</div>
+                    <h4 style="color: #ffffff; font-size: 0.95rem; margin-bottom: 4px;">Care Navigation</h4>
+                    <p style="color: #94a3b8; font-size: 0.78rem; margin: 0;">Specialists & consultation prep</p>
+                </div>
+            </div>
+        </section>
+
+        <footer style="border-top: 1px solid rgba(255,255,255,0.1); padding: 32px 24px; text-align: center; color: #64748b; font-size: 0.85rem;">
+            &copy; 2026 CareNav-AI Systems &bull; Informational Healthcare Platform &bull; Disclaimer: Does not diagnose diseases or make medical treatment decisions.
+        </footer>
+    </div>
+
+    <div id="authScreen" style="display: none;" class="auth-wrapper">
         <div class="auth-container">
             <!-- Left Info Panel -->
             <div class="auth-sidebar">
@@ -209,6 +361,21 @@
                 <span id="supabaseStatusDot" style="width: 8px; height: 8px; border-radius: 50%; background: #94a3b8; display: inline-block;"></span>
                 <span id="supabaseStatusText"><i class="fa-solid fa-cloud"></i> Supabase Cloud</span>
             </div>
+            
+            <!-- Global Search & Theme Toggle Controls -->
+            <div style="display: flex; align-items: center; gap: 8px; margin-right: 12px;">
+                <div style="position: relative; display: flex; align-items: center;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; color: var(--text-muted); font-size: 0.85rem;"></i>
+                    <input type="text" id="globalSearchInput" placeholder="Search records, vitals, doctors..." style="padding: 6px 12px 6px 32px; border-radius: 20px; border: 1px solid var(--border-color); font-size: 0.82rem; background: var(--bg-main); color: var(--text-primary); width: 200px;">
+                </div>
+                <button class="btn btn-outline" id="themeToggleBtn" title="Toggle Light / Dark Theme" style="padding: 6px 12px; font-size: 0.85rem;">
+                    <i class="fa-solid fa-moon" id="themeToggleIcon"></i>
+                </button>
+                <button class="btn btn-outline" id="demoModeToggleBtn" title="Toggle Presentation Demo Mode" style="padding: 6px 12px; font-size: 0.82rem; color: #8b5cf6; border-color: #8b5cf6;">
+                    <i class="fa-solid fa-vial"></i> Demo Mode
+                </button>
+            </div>
+
             <div class="patient-badge" id="patientBadge">
                 <div class="avatar" id="navAvatar">
                     <i class="fa-solid fa-user-injured"></i>
@@ -248,6 +415,38 @@
         <aside class="sidebar">
             <!-- Navigation Menu for Patient -->
             <nav class="nav-menu" id="patientNavMenu">
+                <a href="javascript:void(0)" class="nav-item active" data-tab="dashboard">
+                    <i class="fa-solid fa-house"></i> <span>Dashboard</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-item" data-tab="records">
+                    <i class="fa-solid fa-folder-open"></i> <span>Health Records</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-item" data-tab="aihealth">
+                    <i class="fa-solid fa-robot"></i> <span>AI Health</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-item" data-tab="insights">
+                    <i class="fa-solid fa-chart-line"></i> <span>Health Insights</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-item" data-tab="carenav">
+                    <i class="fa-solid fa-compass"></i> <span>Care Navigator</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-item" data-tab="medications">
+                    <i class="fa-solid fa-pills"></i> <span>Medications</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-item" data-tab="appointments">
+                    <i class="fa-solid fa-calendar-check"></i> <span>Appointments</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-item" data-tab="doctorsummary">
+                    <i class="fa-solid fa-file-waveform"></i> <span>Doctor Summary</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-item" data-tab="settings">
+                    <i class="fa-solid fa-gear"></i> <span>Settings</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-item" data-tab="demomode" style="color: #8b5cf6;">
+                    <i class="fa-solid fa-flask"></i> <span>Demo Mode</span>
+                </a>
+            </nav>
+            <div id="patientNavMenuOriginal" style="display: none;">
                 <button class="nav-item active" data-tab="triage">
                     <i class="fa-solid fa-compass"></i>
                     <span>AI Care Triage</span>
@@ -347,7 +546,7 @@
         <main class="content-area">
 
             <!-- ================= TAB 1: AI CARE TRIAGE & NAVIGATION ================= -->
-            <section id="tab-triage" class="tab-pane active">
+            <section id="tab-triage" class="tab-pane">
                 <div class="section-banner">
                     <div class="banner-text">
                         <h2><i class="fa-solid fa-wand-magic-sparkles"></i> AI Symptom Assessment & Care Triage</h2>
@@ -994,6 +1193,368 @@
                     </div>
                 </div>
             </section>
+
+            <!-- ================= TAB: DASHBOARD (HOME) ================= -->
+            <section id="tab-dashboard" class="tab-pane active">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-house"></i> Dashboard</h2>
+                        <p>Your health overview — vitals, upcoming appointments, recent records and AI insights.</p>
+                    </div>
+                </div>
+                <!-- Greeting -->
+                <div id="dashboardGreeting" style="font-size:1.35rem;font-weight:700;color:var(--text-primary);margin-bottom:24px;">
+                    Good morning 👋 <span id="greetingName"></span>
+                    <div style="font-size:0.88rem;font-weight:400;color:var(--text-secondary);margin-top:4px;">Here's your health overview for today.</div>
+                </div>
+                <!-- Stat Cards -->
+                <div class="ehr-summary-grid" style="margin-bottom:28px;">
+                    <div class="card summary-box" style="cursor:pointer;" onclick="document.querySelector('[data-tab=records]').click()">
+                        <div class="sum-icon bg-blue"><i class="fa-solid fa-file-medical"></i></div>
+                        <div>
+                            <span class="sum-label">Medical Records</span>
+                            <h3 class="sum-value" id="statRecords">—</h3>
+                        </div>
+                    </div>
+                    <div class="card summary-box" style="cursor:pointer;" onclick="document.querySelector('[data-tab=appointments]').click()">
+                        <div class="sum-icon bg-teal"><i class="fa-solid fa-calendar-check"></i></div>
+                        <div>
+                            <span class="sum-label">Appointments</span>
+                            <h3 class="sum-value" id="statAppts">—</h3>
+                        </div>
+                    </div>
+                    <div class="card summary-box" style="cursor:pointer;" onclick="document.querySelector('[data-tab=medications]').click()">
+                        <div class="sum-icon bg-amber"><i class="fa-solid fa-pills"></i></div>
+                        <div>
+                            <span class="sum-label">Active Medications</span>
+                            <h3 class="sum-value" id="statMeds">—</h3>
+                        </div>
+                    </div>
+                    <div class="card summary-box" style="cursor:pointer;" onclick="document.querySelector('[data-tab=aihealth]').click()">
+                        <div class="sum-icon bg-red"><i class="fa-solid fa-robot"></i></div>
+                        <div>
+                            <span class="sum-label">AI Insights</span>
+                            <h3 class="sum-value" id="statInsights">Ready</h3>
+                        </div>
+                    </div>
+                </div>
+                <!-- Recent Vitals Snapshot -->
+                <div class="card" style="margin-bottom:24px;">
+                    <div class="card-header-flex">
+                        <h3><i class="fa-solid fa-heart-pulse"></i> Latest Vitals</h3>
+                        <button class="btn btn-outline btn-sm" onclick="document.querySelector('[data-tab=records]').click()">View All</button>
+                    </div>
+                    <div class="ehr-summary-grid" style="margin:0;">
+                        <div style="text-align:center;padding:12px;">
+                            <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Blood Pressure</div>
+                            <div style="font-size:1.5rem;font-weight:800;color:var(--primary);" id="dashBp">—</div>
+                        </div>
+                        <div style="text-align:center;padding:12px;">
+                            <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Heart Rate</div>
+                            <div style="font-size:1.5rem;font-weight:800;color:var(--teal);" id="dashHr">—</div>
+                        </div>
+                        <div style="text-align:center;padding:12px;">
+                            <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Glucose</div>
+                            <div style="font-size:1.5rem;font-weight:800;color:var(--warning);" id="dashGl">—</div>
+                        </div>
+                        <div style="text-align:center;padding:12px;">
+                            <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">SpO2</div>
+                            <div style="font-size:1.5rem;font-weight:800;color:var(--success);" id="dashSpo2">—</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Health Timeline -->
+                <div class="card">
+                    <div class="card-header-flex">
+                        <h3><i class="fa-solid fa-timeline"></i> Health Timeline</h3>
+                    </div>
+                    <div id="healthTimeline" style="padding:8px 0;">
+                        <div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><h4>No records yet</h4><p>Add vitals or book appointments to see your timeline.</p></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB: AI HEALTH ================= -->
+            <section id="tab-aihealth" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-robot"></i> AI Health Insights</h2>
+                        <p>AI‑generated summaries, observations and actionable recommendations based on your records and vitals.</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" id="refreshAiSummaryBtn"><i class="fa-solid fa-rotate"></i> Refresh AI Summary</button>
+                </div>
+                <div class="card" style="margin-bottom:24px;">
+                    <h3><i class="fa-solid fa-lightbulb"></i> Latest AI Summary</h3>
+                    <p id="aiSummaryText" class="advice-text" style="margin-top:12px;line-height:1.8;">Loading AI summary…</p>
+                </div>
+                <div class="card" style="margin-bottom:24px;">
+                    <h3><i class="fa-solid fa-triangle-exclamation"></i> Observations & Alerts</h3>
+                    <ul id="aiObservationsList" class="info-list" style="margin-top:12px;"></ul>
+                </div>
+                <div class="card">
+                    <h3><i class="fa-solid fa-notes-medical"></i> Recommended Next Steps</h3>
+                    <ul id="aiNextStepsList" class="info-list" style="margin-top:12px;"></ul>
+                    <div style="margin-top:16px;padding:12px;background:var(--warning-light);border:1px solid #fde68a;border-radius:var(--radius-md);font-size:0.82rem;color:#92400e;">
+                        <i class="fa-solid fa-circle-info"></i> <strong>Disclaimer:</strong> AI insights are informational only. CareNav AI does not diagnose diseases or make medical treatment decisions. Always consult a qualified healthcare professional.
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB: HEALTH INSIGHTS (CHARTS) ================= -->
+            <section id="tab-insights" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-chart-line"></i> Health Insights & Trends</h2>
+                        <p>Visualize vital trends, medication adherence and lab results over time.</p>
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <label style="font-size:0.82rem;font-weight:600;color:var(--text-secondary);">Range:</label>
+                        <select id="insightRangeSelect" class="form-control" style="width:auto;padding:6px 10px;font-size:0.82rem;">
+                            <option value="30" selected>Last 30 Days</option>
+                            <option value="90">Last 90 Days</option>
+                            <option value="180">Last 6 Months</option>
+                            <option value="365">Last Year</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="records-content-grid">
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <h3><i class="fa-solid fa-heart-pulse"></i> Blood Pressure Trend</h3>
+                            <span class="badge-tag">mmHg</span>
+                        </div>
+                        <canvas id="bpChart" height="200"></canvas>
+                    </div>
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <h3><i class="fa-solid fa-droplet"></i> Blood Glucose Trend</h3>
+                            <span class="badge-tag">mg/dL</span>
+                        </div>
+                        <canvas id="glucoseChart" height="200"></canvas>
+                    </div>
+                </div>
+                <div class="records-content-grid" style="margin-top:24px;">
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <h3><i class="fa-solid fa-wave-square"></i> Heart Rate Trend</h3>
+                            <span class="badge-tag">bpm</span>
+                        </div>
+                        <canvas id="hrChart" height="200"></canvas>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fa-solid fa-clipboard-list"></i> AI Insight Summary</h3>
+                        <p id="insightSummaryText" class="advice-text" style="margin-top:12px;line-height:1.8;"></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB: CARE NAVIGATOR ================= -->
+            <section id="tab-carenav" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-compass"></i> Care Navigator</h2>
+                        <p>Personalized care pathways, specialist suggestions and next‑step recommendations based on your health profile.</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" id="generateCarePathBtn"><i class="fa-solid fa-rocket"></i> Generate Care Path</button>
+                </div>
+                <div class="card" style="margin-bottom:24px;">
+                    <h3><i class="fa-solid fa-map"></i> Your Care Pathway</h3>
+                    <p id="carePathText" class="advice-text" style="margin-top:12px;line-height:1.8;color:var(--text-muted);">Click "Generate Care Path" above to get an AI‑guided care pathway based on your health profile, vitals, and medical history.</p>
+                </div>
+                <div class="card" style="margin-bottom:24px;">
+                    <h3><i class="fa-solid fa-user-doctor"></i> Recommended Specialists</h3>
+                    <ul id="recommendedSpecialistsList" class="info-list" style="margin-top:12px;"></ul>
+                </div>
+                <div class="card">
+                    <h3><i class="fa-solid fa-hospital"></i> Find & Book Doctors</h3>
+                    <p class="card-subtitle">Browse verified specialists and book appointments directly.</p>
+                    <button class="btn btn-secondary btn-sm" onclick="document.querySelector('[data-tab=doctors]') && document.querySelector('[data-tab=doctors]').click()"><i class="fa-solid fa-calendar-plus"></i> Go to Doctor Booking</button>
+                </div>
+            </section>
+
+            <!-- ================= TAB: DOCTOR VISIT SUMMARY ================= -->
+            <section id="tab-doctorsummary" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-file-waveform"></i> Doctor Visit Summary</h2>
+                        <p>A printable overview of your health profile prepared for your next consultation.</p>
+                    </div>
+                    <button class="btn btn-outline btn-sm" id="printDoctorSummaryBtn" style="color:var(--teal);border-color:var(--teal);"><i class="fa-solid fa-print"></i> Print Summary</button>
+                </div>
+                <div id="doctorSummaryContent">
+                    <div class="card" style="margin-bottom:24px;">
+                        <h3><i class="fa-solid fa-user-injured"></i> Patient Overview</h3>
+                        <div id="doctorPatientOverview" style="margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;"></div>
+                    </div>
+                    <div class="records-content-grid">
+                        <div class="card">
+                            <h3><i class="fa-solid fa-heart-pulse"></i> Recent Vitals</h3>
+                            <div id="summaryRecentVitals" style="margin-top:12px;"></div>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fa-solid fa-pills"></i> Active Medications</h3>
+                            <div id="summaryMeds" style="margin-top:12px;"></div>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-top:24px;">
+                        <h3><i class="fa-solid fa-circle-question"></i> Questions to Ask Your Doctor</h3>
+                        <ul id="summaryDoctorQuestions" class="info-list" style="margin-top:12px;"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB: MEDICATIONS ================= -->
+            <section id="tab-medications" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-pills"></i> Medications</h2>
+                        <p>Manage active prescriptions, dosage schedules and refill reminders.</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" id="openAddMedModalNew"><i class="fa-solid fa-plus"></i> Add Medication</button>
+                </div>
+                <div class="card" style="margin-bottom:24px;">
+                    <div class="card-header-flex">
+                        <h3><i class="fa-solid fa-list-check"></i> Active Medications</h3>
+                        <span class="badge-tag" id="medsCount">0 medications</span>
+                    </div>
+                    <div class="meds-list" id="medicationsListNew" style="margin-top:12px;"></div>
+                    <div class="empty-state" id="medsEmptyState" style="display:none;padding:40px 20px;">
+                        <i class="fa-solid fa-pills"></i>
+                        <h4>No medications logged</h4>
+                        <p>Add a medication using the button above to begin tracking your regimen.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB: APPOINTMENTS ================= -->
+            <section id="tab-appointments" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-calendar-check"></i> Appointments</h2>
+                        <p>View upcoming and past consultations and book new appointments with verified specialists.</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" onclick="document.querySelector('[data-tab=doctors]') && document.querySelector('[data-tab=doctors]').click()"><i class="fa-solid fa-plus"></i> Book New</button>
+                </div>
+                <div class="records-content-grid">
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <h3><i class="fa-solid fa-clock"></i> Upcoming Appointments</h3>
+                            <span class="badge-tag status-normal" id="upcomingCount">0 upcoming</span>
+                        </div>
+                        <ul id="upcomingApptsList" class="info-list" style="margin-top:12px;"></ul>
+                        <div class="empty-state" id="upcomingEmpty" style="display:none;padding:30px 20px;">
+                            <i class="fa-solid fa-calendar-xmark"></i>
+                            <h4>No upcoming appointments</h4>
+                            <p>Book a specialist consultation to get started.</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header-flex">
+                            <h3><i class="fa-solid fa-history"></i> Past Appointments</h3>
+                        </div>
+                        <ul id="pastApptsList" class="info-list" style="margin-top:12px;"></ul>
+                        <div class="empty-state" id="pastEmpty" style="display:none;padding:30px 20px;">
+                            <i class="fa-solid fa-calendar"></i>
+                            <h4>No past appointments</h4>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB: SETTINGS ================= -->
+            <section id="tab-settings" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-gear"></i> Settings</h2>
+                        <p>Configure your profile, theme, notification preferences and privacy settings.</p>
+                    </div>
+                </div>
+                <div class="records-content-grid">
+                    <div class="card">
+                        <h3><i class="fa-solid fa-user"></i> Profile Information</h3>
+                        <form id="profileForm" style="margin-top:16px;">
+                            <div class="form-group">
+                                <label for="profileName">Full Name</label>
+                                <input type="text" id="profileName" class="form-control" placeholder="Your name">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group flex-1">
+                                    <label for="profileEmail">Email</label>
+                                    <input type="email" id="profileEmail" class="form-control" placeholder="email@example.com">
+                                </div>
+                                <div class="form-group flex-1">
+                                    <label for="profileAge">Age</label>
+                                    <input type="number" id="profileAge" class="form-control" min="1" max="120" placeholder="30">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Profile</button>
+                        </form>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:20px;">
+                        <div class="card">
+                            <h3><i class="fa-solid fa-moon"></i> Theme & Display</h3>
+                            <p class="card-subtitle">Toggle between light and dark mode.</p>
+                            <button class="btn btn-outline btn-sm" id="themeToggleBtnSettings"><i class="fa-solid fa-moon" id="themeIconSettings"></i> Toggle Dark Mode</button>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fa-solid fa-bell"></i> Notifications</h3>
+                            <div class="form-group" style="margin-top:12px;">
+                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88rem;">
+                                    <input type="checkbox" id="notifyEmail" checked> Email appointment reminders
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.88rem;">
+                                    <input type="checkbox" id="notifyMedReminders" checked> Medication reminders
+                                </label>
+                            </div>
+                            <button class="btn btn-primary btn-sm" id="saveNotifSettings"><i class="fa-solid fa-check"></i> Save Settings</button>
+                        </div>
+                        <div class="card">
+                            <h3><i class="fa-solid fa-shield-halved"></i> Privacy & Security</h3>
+                            <p class="card-subtitle" style="margin-bottom:12px;">Your data is stored locally and never shared without consent.</p>
+                            <button class="btn btn-outline btn-sm" style="color:var(--danger);border-color:var(--danger);" id="clearAllDataBtn"><i class="fa-solid fa-trash"></i> Clear All Local Data</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= TAB: DEMO MODE ================= -->
+            <section id="tab-demomode" class="tab-pane">
+                <div class="section-banner">
+                    <div class="banner-text">
+                        <h2><i class="fa-solid fa-flask"></i> Demo Mode</h2>
+                        <p>Explore a pre‑populated fictional patient experience for presentations and demos.</p>
+                    </div>
+                    <span class="badge-tag" style="background:rgba(139,92,246,0.1);color:#7c3aed;border-color:#c4b5fd;">🧪 Demo Environment</span>
+                </div>
+                <div class="card" style="margin-bottom:24px;">
+                    <h3><i class="fa-solid fa-circle-info"></i> About Demo Mode</h3>
+                    <p class="advice-text" style="margin-top:12px;line-height:1.8;">Demo Mode loads a pre‑populated set of fictional patient data for use in presentations, demos and walkthroughs. <strong>No real patient data is used or affected.</strong> Toggle demo mode using the <strong>"Demo Mode"</strong> button in the top navigation bar.</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fa-solid fa-user-injured"></i> Demo Patient: Alex Morgan</h3>
+                    <div class="ehr-summary-grid" style="margin-top:14px;">
+                        <div class="summary-box card" style="box-shadow:none;border:1px solid var(--border-color);">
+                            <div class="sum-icon bg-red"><i class="fa-solid fa-droplet"></i></div>
+                            <div><span class="sum-label">Blood Type</span><h3 class="sum-value">O Positive</h3></div>
+                        </div>
+                        <div class="summary-box card" style="box-shadow:none;border:1px solid var(--border-color);">
+                            <div class="sum-icon bg-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <div><span class="sum-label">Allergies</span><h3 class="sum-value">Penicillin, Peanuts</h3></div>
+                        </div>
+                        <div class="summary-box card" style="box-shadow:none;border:1px solid var(--border-color);">
+                            <div class="sum-icon bg-blue"><i class="fa-solid fa-heart-pulse"></i></div>
+                            <div><span class="sum-label">Conditions</span><h3 class="sum-value">Mild Asthma</h3></div>
+                        </div>
+                        <div class="summary-box card" style="box-shadow:none;border:1px solid var(--border-color);">
+                            <div class="sum-icon bg-teal"><i class="fa-solid fa-pills"></i></div>
+                            <div><span class="sum-label">Medications</span><h3 class="sum-value">3 Active</h3></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -1415,6 +1976,7 @@
 
     <!-- Scripts -->
     <script src="app.js"></script>
+    <script src="tabs.js"></script>
 </body>
 
 </html>

@@ -834,6 +834,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     CareNavSupabase.init();
     UIVisibilityManager.applySettings();
     UIVisibilityManager.bindEvents();
+    initThemeEngine();
+    initSidebarCollapsible();
+    initLandingPageRouter();
+    initGlobalSearch();
+    initDemoModeToggle();
     initVoiceDictation();
     initAutoSoapGenerator();
 
@@ -981,13 +986,14 @@ async function loginUser(user, saveToStorage = true) {
         if (switchRoleText) switchRoleText.textContent = 'Switch to Doctor Station';
         if (sidebarDisclaimerText) sidebarDisclaimerText.textContent = 'CareNav AI assists with health management & navigation. In immediate life-threatening emergencies, call 911 or visit the nearest ER.';
 
-        // Select Triage tab by default
+        // Select Dashboard tab by default for patients
         document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-        const triageNav = document.querySelector('#patientNavMenu .nav-item[data-tab="triage"]');
-        if (triageNav) triageNav.classList.add('active');
-        const triagePane = document.getElementById('tab-triage');
-        if (triagePane) triagePane.classList.add('active');
+        const dashNav = document.querySelector('#patientNavMenu .nav-item[data-tab="dashboard"]');
+        if (dashNav) dashNav.classList.add('active');
+        const dashPane = document.getElementById('tab-dashboard');
+        if (dashPane) dashPane.classList.add('active');
+
 
         // Sync from SQLite if online
         if (CareNavAPI.isOnline && user.id) {
@@ -1021,7 +1027,12 @@ async function loginUser(user, saveToStorage = true) {
     }
 
     showScreen('app');
+    // Render dashboard with fresh data
+    setTimeout(() => {
+        if (typeof renderDashboardTab === 'function') renderDashboardTab();
+    }, 250);
 }
+
 
 // ================= AUTH MODULE (LOGIN & SIGN UP LOGIC) =================
 function initAuthModule() {
@@ -1282,9 +1293,20 @@ function initNavigation() {
             else if (targetTab === 'doc-patients' && typeof renderDoctorPatients === 'function') renderDoctorPatients();
             else if (targetTab === 'doc-schedule' && typeof renderDoctorSchedule === 'function') renderDoctorSchedule();
             else if (targetTab === 'doc-prescriptions' && typeof renderDoctorPrescriptions === 'function') renderDoctorPrescriptions();
+
+            // New tab renders (from tabs.js)
+            else if (targetTab === 'dashboard'     && typeof renderDashboardTab === 'function')     renderDashboardTab();
+            else if (targetTab === 'aihealth'      && typeof renderAIHealthTab === 'function')      renderAIHealthTab();
+            else if (targetTab === 'insights'      && typeof renderInsightsCharts === 'function')   renderInsightsCharts();
+            else if (targetTab === 'carenav'       && typeof renderCareNavTab === 'function')       renderCareNavTab();
+            else if (targetTab === 'doctorsummary' && typeof renderDoctorSummaryTab === 'function') renderDoctorSummaryTab();
+            else if (targetTab === 'medications'   && typeof renderMedicationsTab === 'function')   renderMedicationsTab();
+            else if (targetTab === 'appointments'  && typeof renderAppointmentsTab === 'function')  renderAppointmentsTab();
+            else if (targetTab === 'settings'      && typeof initSettingsTab === 'function')        initSettingsTab();
         });
     });
 }
+
 
 // ================= MODULE 1: AI CARE TRIAGE & NAVIGATION =================
 function initTriageModule() {
@@ -3834,5 +3856,132 @@ function checkPrescriptionSafety(patient, medName) {
     }
 
     return { safe: true };
+}
+
+
+
+// ================= CARENAV-AI 16-PHASE SYSTEM HANDLER =================
+
+// Theme Toggle Handler (Light / Dark Mode)
+function initThemeEngine() {
+    const themeBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeToggleIcon');
+    const savedTheme = localStorage.getItem('carenav_theme') || 'light';
+
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (themeIcon) themeIcon.className = 'fa-solid fa-sun';
+    }
+
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            if (current === 'dark') {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem('carenav_theme', 'light');
+                if (themeIcon) themeIcon.className = 'fa-solid fa-moon';
+                showToast('Switched to Light Theme', 'info');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('carenav_theme', 'dark');
+                if (themeIcon) themeIcon.className = 'fa-solid fa-sun';
+                showToast('Switched to Dark Theme', 'info');
+            }
+        });
+    }
+}
+
+// Collapsible Sidebar Handler
+function initSidebarCollapsible() {
+    const toggleBtn = document.getElementById('toggleSidebarBtn');
+    const sidebar = document.querySelector('.sidebar');
+    if (!toggleBtn || !sidebar) return;
+
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        localStorage.setItem('carenav_sidebar_collapsed', isCollapsed ? 'true' : 'false');
+    });
+
+    if (localStorage.getItem('carenav_sidebar_collapsed') === 'true') {
+        sidebar.classList.add('collapsed');
+    }
+}
+
+// Landing Page Routing
+function initLandingPageRouter() {
+    const landingScreen = document.getElementById('landingScreen');
+    const authScreen = document.getElementById('authScreen');
+    const appScreen = document.getElementById('appScreen');
+
+    const showLanding = () => {
+        if (landingScreen) landingScreen.style.display = 'flex';
+        if (authScreen) authScreen.style.display = 'none';
+        if (appScreen) appScreen.style.display = 'none';
+    };
+
+    const showAuth = () => {
+        if (landingScreen) landingScreen.style.display = 'none';
+        if (authScreen) authScreen.style.display = 'flex';
+        if (appScreen) appScreen.style.display = 'none';
+    };
+
+    const landingSignInBtn = document.getElementById('landingSignInBtn');
+    const landingGetStartedBtn = document.getElementById('landingGetStartedBtn');
+    const heroGetStartedBtn = document.getElementById('heroGetStartedBtn');
+    const heroExploreBtn = document.getElementById('heroExploreBtn');
+
+    if (landingSignInBtn) landingSignInBtn.addEventListener('click', showAuth);
+    if (landingGetStartedBtn) landingGetStartedBtn.addEventListener('click', showAuth);
+    if (heroGetStartedBtn) heroGetStartedBtn.addEventListener('click', showAuth);
+    if (heroExploreBtn) {
+        heroExploreBtn.addEventListener('click', () => {
+            const featSec = document.getElementById('landingFeatures');
+            if (featSec) featSec.scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+}
+
+// Global Search Filter
+function initGlobalSearch() {
+    const searchInput = document.getElementById('globalSearchInput');
+    if (!searchInput) return;
+
+    searchInput.addEventListener('input', (e) => {
+        const q = e.target.value.toLowerCase().trim();
+        if (!q) return;
+
+        // Highlight matching elements or filter active tables
+        const activeTab = document.querySelector('.tab-pane.active');
+        if (activeTab) {
+            const cards = activeTab.querySelectorAll('.card, tr, .consultation-card');
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(q) ? '' : 'none';
+            });
+        }
+    });
+}
+
+// Presentation Demo Mode Handler
+let isDemoModeActive = false;
+function initDemoModeToggle() {
+    const demoBtn = document.getElementById('demoModeToggleBtn');
+    if (!demoBtn) return;
+
+    demoBtn.addEventListener('click', () => {
+        isDemoModeActive = !isDemoModeActive;
+        if (isDemoModeActive) {
+            demoBtn.style.background = 'rgba(139, 92, 246, 0.2)';
+            demoBtn.style.fontWeight = '700';
+            demoBtn.innerHTML = '<i class="fa-solid fa-vial"></i> DEMO MODE ACTIVE';
+            showToast('Presentation Demo Mode Activated: Using fictional college presentation data.', 'info');
+        } else {
+            demoBtn.style.background = '';
+            demoBtn.style.fontWeight = '';
+            demoBtn.innerHTML = '<i class="fa-solid fa-vial"></i> Demo Mode';
+            showToast('Exited Demo Mode: Reverted to standard patient records.', 'info');
+        }
+    });
 }
 
