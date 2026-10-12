@@ -1830,3 +1830,94 @@ body {
 }
 
 
+
+/* ════════════════════════════════════════════════════════════
+   CareNav-AI — Phase 3-16 New Tab Styles
+   ════════════════════════════════════════════════════════════ */
+
+/* Dashboard stat cards hover */
+.summary-box[onclick] {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.summary-box[onclick]:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Print styles for Doctor Summary */
+@media print {
+    .navbar, .sidebar, .section-banner button, #printDoctorSummaryBtn { display: none !important; }
+    .content-area { padding: 0; }
+    #doctorSummaryContent { padding: 20px; }
+    .card { box-shadow: none; border: 1px solid #e2e8f0; }
+}
+
+/* Insights charts wrapper */
+#tab-insights canvas {
+    margin-top: 16px;
+}
+
+/* Appointments status pills responsive */
+#upcomingApptsList li,
+#pastApptsList li {
+    list-style: none;
+}
+
+/* Settings form reset (inside .card) */
+#profileForm {
+    margin-top: 0;
+}
+
+/* Sidebar collapsed state */
+.sidebar.collapsed {
+    width: 64px;
+    overflow: hidden;
+}
+.sidebar.collapsed .nav-item span,
+.sidebar.collapsed .sidebar-vitals-card,
+.sidebar.collapsed .medical-disclaimer,
+.sidebar.collapsed .brand-info {
+    display: none;
+}
+.sidebar.collapsed .nav-item {
+    justify-content: center;
+    padding: 12px;
+}
+.sidebar.collapsed .nav-item i {
+    width: auto;
+}
+
+/* Dark mode for new tabs */
+[data-theme="dark"] .summary-box,
+[data-theme="dark"] #tab-dashboard .card,
+[data-theme="dark"] #tab-aihealth .card,
+[data-theme="dark"] #tab-insights .card,
+[data-theme="dark"] #tab-carenav .card,
+[data-theme="dark"] #tab-doctorsummary .card,
+[data-theme="dark"] #tab-medications .card,
+[data-theme="dark"] #tab-appointments .card,
+[data-theme="dark"] #tab-settings .card,
+[data-theme="dark"] #tab-demomode .card {
+    background: var(--bg-card, #1e293b);
+    border-color: rgba(255,255,255,0.08);
+    color: var(--text-primary, #f1f5f9);
+}
+
+/* Medication item hover */
+.med-item {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.med-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Animated greeting */
+#dashboardGreeting {
+    animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
